@@ -1,0 +1,589 @@
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
+
+export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "14.18"
+  }
+  public: {
+    Tables: {
+      account_approval_email_log: {
+        Row: {
+          sent_at: string
+          user_id: string
+        }
+        Insert: {
+          sent_at?: string
+          user_id: string
+        }
+        Update: {
+          sent_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      admin_favorites: {
+        Row: {
+          admin_id: string
+          created_at: string
+          id: string
+          profile_id: string
+        }
+        Insert: {
+          admin_id: string
+          created_at?: string
+          id?: string
+          profile_id: string
+        }
+        Update: {
+          admin_id?: string
+          created_at?: string
+          id?: string
+          profile_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_favorites_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      internal_secrets: {
+        Row: {
+          name: string
+          value: string
+        }
+        Insert: {
+          name: string
+          value: string
+        }
+        Update: {
+          name?: string
+          value?: string
+        }
+        Relationships: []
+      }
+      member_deletion_requests: {
+        Row: {
+          created_at: string
+          id: string
+          requested_by: string
+          target_user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          requested_by?: string
+          target_user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          requested_by?: string
+          target_user_id?: string
+        }
+        Relationships: []
+      }
+      mission_digest_log: {
+        Row: {
+          id: string
+          mission_count: number
+          mission_ids: string[] | null
+          recipient_count: number
+          sent_at: string
+          wave2_due_at: string | null
+          wave2_recipient_count: number | null
+          wave2_sent_at: string | null
+        }
+        Insert: {
+          id?: string
+          mission_count: number
+          mission_ids?: string[] | null
+          recipient_count: number
+          sent_at?: string
+          wave2_due_at?: string | null
+          wave2_recipient_count?: number | null
+          wave2_sent_at?: string | null
+        }
+        Update: {
+          id?: string
+          mission_count?: number
+          mission_ids?: string[] | null
+          recipient_count?: number
+          sent_at?: string
+          wave2_due_at?: string | null
+          wave2_recipient_count?: number | null
+          wave2_sent_at?: string | null
+        }
+        Relationships: []
+      }
+      missions: {
+        Row: {
+          comment_text: string | null
+          community_url: string
+          created_at: string
+          flair: string | null
+          id: string
+          instructions: string | null
+          is_active: boolean
+          is_locked: boolean
+          payout: number
+          post_body: string | null
+          post_title: string | null
+          reserved_by: string | null
+          reserved_until: string | null
+          subreddit: string
+          target_post_url: string | null
+          title: string
+          type: Database["public"]["Enums"]["mission_type"]
+        }
+        Insert: {
+          comment_text?: string | null
+          community_url?: string
+          created_at?: string
+          flair?: string | null
+          id?: string
+          instructions?: string | null
+          is_active?: boolean
+          is_locked?: boolean
+          payout?: number
+          post_body?: string | null
+          post_title?: string | null
+          reserved_by?: string | null
+          reserved_until?: string | null
+          subreddit: string
+          target_post_url?: string | null
+          title: string
+          type: Database["public"]["Enums"]["mission_type"]
+        }
+        Update: {
+          comment_text?: string | null
+          community_url?: string
+          created_at?: string
+          flair?: string | null
+          id?: string
+          instructions?: string | null
+          is_active?: boolean
+          is_locked?: boolean
+          payout?: number
+          post_body?: string | null
+          post_title?: string | null
+          reserved_by?: string | null
+          reserved_until?: string | null
+          subreddit?: string
+          target_post_url?: string | null
+          title?: string
+          type?: Database["public"]["Enums"]["mission_type"]
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string
+          email_notifications: boolean
+          full_name: string
+          id: string
+          niches: string[]
+          phone_number: string
+          reddit_profile_url: string
+          referral_code: string
+          referred_by: string | null
+          rejection_reason: string | null
+          status: Database["public"]["Enums"]["account_status"]
+          wallet_address: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string
+          email_notifications?: boolean
+          full_name?: string
+          id: string
+          niches?: string[]
+          phone_number?: string
+          reddit_profile_url?: string
+          referral_code?: string
+          referred_by?: string | null
+          rejection_reason?: string | null
+          status?: Database["public"]["Enums"]["account_status"]
+          wallet_address?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          email_notifications?: boolean
+          full_name?: string
+          id?: string
+          niches?: string[]
+          phone_number?: string
+          reddit_profile_url?: string
+          referral_code?: string
+          referred_by?: string | null
+          rejection_reason?: string | null
+          status?: Database["public"]["Enums"]["account_status"]
+          wallet_address?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_referred_by_fkey"
+            columns: ["referred_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      referral_announce_log: {
+        Row: {
+          campaign: string
+          id: string
+          recipient_count: number
+          sent_at: string
+        }
+        Insert: {
+          campaign?: string
+          id?: string
+          recipient_count?: number
+          sent_at?: string
+        }
+        Update: {
+          campaign?: string
+          id?: string
+          recipient_count?: number
+          sent_at?: string
+        }
+        Relationships: []
+      }
+      submission_rejection_email_log: {
+        Row: {
+          sent_at: string
+          submission_id: string
+        }
+        Insert: {
+          sent_at?: string
+          submission_id: string
+        }
+        Update: {
+          sent_at?: string
+          submission_id?: string
+        }
+        Relationships: []
+      }
+      submissions: {
+        Row: {
+          admin_note: string | null
+          amount: number
+          created_at: string
+          id: string
+          mission_id: string
+          paid: boolean
+          reviewed_at: string | null
+          status: Database["public"]["Enums"]["submission_status"]
+          submitted_url: string
+          talentir_payout_id: string | null
+          talentir_sent_at: string | null
+          talentir_status: string | null
+          user_id: string
+        }
+        Insert: {
+          admin_note?: string | null
+          amount?: number
+          created_at?: string
+          id?: string
+          mission_id: string
+          paid?: boolean
+          reviewed_at?: string | null
+          status?: Database["public"]["Enums"]["submission_status"]
+          submitted_url: string
+          talentir_payout_id?: string | null
+          talentir_sent_at?: string | null
+          talentir_status?: string | null
+          user_id: string
+        }
+        Update: {
+          admin_note?: string | null
+          amount?: number
+          created_at?: string
+          id?: string
+          mission_id?: string
+          paid?: boolean
+          reviewed_at?: string | null
+          status?: Database["public"]["Enums"]["submission_status"]
+          submitted_url?: string
+          talentir_payout_id?: string | null
+          talentir_sent_at?: string | null
+          talentir_status?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "submissions_mission_id_fkey"
+            columns: ["mission_id"]
+            isOneToOne: false
+            referencedRelation: "missions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "submissions_mission_id_fkey"
+            columns: ["mission_id"]
+            isOneToOne: false
+            referencedRelation: "public_missions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+    }
+    Views: {
+      public_missions: {
+        Row: {
+          community_url: string | null
+          created_at: string | null
+          id: string | null
+          is_active: boolean | null
+          is_locked: boolean | null
+          payout: number | null
+          reserved_until: string | null
+          subreddit: string | null
+          title: string | null
+          type: Database["public"]["Enums"]["mission_type"] | null
+        }
+        Insert: {
+          community_url?: string | null
+          created_at?: string | null
+          id?: string | null
+          is_active?: boolean | null
+          is_locked?: boolean | null
+          payout?: number | null
+          reserved_until?: string | null
+          subreddit?: string | null
+          title?: string | null
+          type?: Database["public"]["Enums"]["mission_type"] | null
+        }
+        Update: {
+          community_url?: string | null
+          created_at?: string | null
+          id?: string | null
+          is_active?: boolean | null
+          is_locked?: boolean | null
+          payout?: number | null
+          reserved_until?: string | null
+          subreddit?: string | null
+          title?: string | null
+          type?: Database["public"]["Enums"]["mission_type"] | null
+        }
+        Relationships: []
+      }
+    }
+    Functions: {
+      admin_referral_earnings: {
+        Args: never
+        Returns: {
+          approved_missions: number
+          earned: number
+          invited: number
+          referrer_id: string
+          username: string
+          validated: number
+          wallet: string
+        }[]
+      }
+      get_mission_brief: {
+        Args: { _mission_id: string }
+        Returns: {
+          comment_text: string
+          community_url: string
+          flair: string
+          instructions: string
+          post_body: string
+          post_title: string
+          target_post_url: string
+        }[]
+      }
+      get_my_referrals: {
+        Args: never
+        Returns: {
+          approved_missions: number
+          earned: number
+          joined_at: string
+          status: Database["public"]["Enums"]["account_status"]
+          username: string
+        }[]
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_accepted: { Args: { _user_id: string }; Returns: boolean }
+      reserve_mission: { Args: { _mission_id: string }; Returns: string }
+      run_mission_digest_wave2: { Args: never; Returns: undefined }
+    }
+    Enums: {
+      account_status: "pending" | "accepted" | "rejected"
+      app_role: "admin" | "user"
+      mission_type: "post" | "comment"
+      submission_status: "pending" | "approved" | "rejected"
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
+}
+
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
+
+export type Tables<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R
+    }
+    ? R
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
+    : never
+
+export type TablesInsert<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I
+    }
+    ? I
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
+    : never
+
+export type TablesUpdate<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U
+    }
+    ? U
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
+    : never
+
+export type Enums<
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never) = never,
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never) = never,
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never
+
+export const Constants = {
+  public: {
+    Enums: {
+      account_status: ["pending", "accepted", "rejected"],
+      app_role: ["admin", "user"],
+      mission_type: ["post", "comment"],
+      submission_status: ["pending", "approved", "rejected"],
+    },
+  },
+} as const

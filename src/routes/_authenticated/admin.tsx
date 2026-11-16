@@ -1,0 +1,1115 @@
+import { formatAmount } from "@/lib/utils";
+import { createFileRoute } from "@tanstack/react-router";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useRef, useState, type ComponentType } from "react";
+import { toast } from "sonner";
+import {
+  CheckCircle2,
+  CircleDollarSign,
+  Clock3,
+  Download,
+  FileText,
+  Loader2,
+  MessageSquare,
+  Pencil,
+  Plus,
+  Radio,
+  RefreshCw,
+  Send,
+  Trash2,
+  Star,
+  UserRound,
+  Gift,
+  XCircle,
+} from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { DashboardLayout } from "@/components/dashboard-layout";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { supabase } from "@/integrations/supabase/client";
+import {
+  useAdminFavorites,
+  useAllMissions,
+  useAllProfiles,
+  useAllSubmissions,
+  useDeleteMember,
+  useIsAdmin,
+  useToggleFavorite,
+  type Mission,
+} from "@/lib/data";
+import { payWithTalentir, refreshTalentirStatus } from "@/lib/talentir.functions";
+
+const LIVE_SITE = "https://reddit-task-money.lovable.app";
+
+
+export const Route = createFileRoute("/_authenticated/admin")({
+  head: () => ({
+    meta: [
+      { title: "Administration — TaskReddit" },
+      { name: "description", content: "Manage missions, submissions and Reddit accounts." },
+      { property: "og:title", content: "Administration — TaskReddit" },
+      { property: "og:description", content: "TaskReddit mission and submission administration." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
+  component: AdminPage,
+});
+
+type Draft = Partial<Mission> & { type: "post" | "comment" };
+type AdminReferralRow = {
+  referrer_id: string;
+  username: string;
+  wallet: string;
+  invited: number;
+  validated: number;
+  approved_missions: number;
+  earned: number;
+};
+type SubmissionTypeFilter = "all" | "post" | "comment";
+type SubmissionStatusFilter = "all" | "pending" | "approved" | "rejected";
+
+function talentirStatusLabel(status: string | null | undefined) {
+  switch (status) {
+    case "approved":
+      return "claim link sent";
+    case "requested":
+      return "claimed, transfer in progress";
+    case "completed":
+      return "money received";
+    case "failed":
+      return "failed";
+    case "expired":
+      return "link expired";
+    default:
+      return status ?? "sent";
+  }
+}
+
+function extractRedditSubreddit(value: string) {
+  const match = value.match(/(?:^|\/)r\/([^/?#]+)/i);
+  return match?.[1]?.trim().replace(/^r\//i, "") ?? "";
+}
+
+function AdminPage() {
+  const { data: isAdmin, isLoading: loadingRole } = useIsAdmin();
+  const qc = useQueryClient();
+  const { data: missions } = useAllMissions();
+  const { data: submissions } = useAllSubmissions();
+  const { data: profiles } = useAllProfiles();
+  const { data: favoriteIds } = useAdminFavorites();
+  const toggleFavorite = useToggleFavorite();
+  const deleteMember = useDeleteMember();
+  const { data: referralRows } = useQuery({
+    queryKey: ["referrals", "admin"],
+    enabled: !!isAdmin,
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("admin_referral_earnings" as never);
+      if (error) throw error;
+      return (data ?? []) as unknown as AdminReferralRow[];
+    },
+  });
+  const [pendingDelete, setPendingDelete] = useState<{ id: string; label: string } | null>(null);
+  const [draft, setDraft] = useState<Draft | null>(null);
+
+  const [userSearch, setUserSearch] = useState("");
+  const [userFilter, setUserFilter] = useState<"all" | "pending" | "accepted" | "rejected">("all");
+  const [submittedFilter, setSubmittedFilter] = useState<"all" | "yes" | "no">("all");
+  const [favoritesOnly, setFavoritesOnly] = useState(false);
+  const [referralsOnly, setReferralsOnly] = useState(false);
+  const [submissionTypeFilter, setSubmissionTypeFilter] = useState<SubmissionTypeFilter>("all");
+  const [submissionStatusFilter, setSubmissionStatusFilter] = useState<SubmissionStatusFilter>("all");
+  const [missionFilter, setMissionFilter] = useState<"live" | "all">("live");
+  const [pendingPay, setPendingPay] = useState<{
+    id: string;
+    name: string;
+    email: string;
+    title: string;
+    amount: number;
+    url: string;
+  } | null>(null);
+  const [paying, setPaying] = useState(false);
+  const payTalentirFn = useServerFn(payWithTalentir);
+  const refreshTalentirFn = useServerFn(refreshTalentirStatus);
+  const finishedReturn = useRef(false);
+
+  // Back from Talentir's approval screen (?talentir=<submissionId>): send the claim link.
+  useEffect(() => {
+    if (!isAdmin || finishedReturn.current) return;
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("talentir");
+    if (!id) return;
+    finishedReturn.current = true;
+    params.delete("talentir");
+    const qs = params.toString();
+    window.history.replaceState(null, "", `${window.location.pathname}${qs ? `?${qs}` : ""}`);
+    void runTalentirPay(id, true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAdmin]);
+
+
+  if (loadingRole) {
+    return (
+      <DashboardLayout title="Administration">
+        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+      </DashboardLayout>
+    );
+  }
+  if (!isAdmin) {
+    return (
+      <DashboardLayout title="Administration">
+        <div className="panel p-8 text-center text-sm text-muted-foreground">Access restricted.</div>
+      </DashboardLayout>
+    );
+  }
+
+  const toPay = (submissions ?? [])
+    .filter((s) => s.status === "approved" && !s.paid)
+    .reduce((sum, s) => sum + Number(s.amount), 0);
+
+  const fmtDate = (v: string) =>
+    new Date(v).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
+
+  type AdminSubmission = NonNullable<typeof submissions>[number];
+  const activity = new Map<
+    string,
+    { last: AdminSubmission; approved: number; earned: number; total: number }
+  >();
+  for (const s of submissions ?? []) {
+    const cur = activity.get(s.user_id);
+    if (!cur) {
+      activity.set(s.user_id, {
+        last: s,
+        approved: s.status === "approved" ? 1 : 0,
+        earned: s.status === "approved" ? Number(s.amount) : 0,
+        total: 1,
+      });
+    } else {
+      if (new Date(s.created_at) > new Date(cur.last.created_at)) cur.last = s;
+      cur.total += 1;
+      if (s.status === "approved") {
+        cur.approved += 1;
+        cur.earned += Number(s.amount);
+      }
+    }
+  }
+
+  const query = userSearch.trim().toLowerCase();
+  const favorites = new Set(favoriteIds ?? []);
+  const referralBy = new Map<string, AdminReferralRow>();
+  for (const r of referralRows ?? []) referralBy.set(r.referrer_id, r);
+  const referralOwed = (referralRows ?? []).reduce((sum, r) => sum + Number(r.earned), 0);
+  const visibleProfiles = (profiles ?? [])
+    .filter((p) => (userFilter === "all" ? true : p.status === userFilter))
+    .filter((p) =>
+      submittedFilter === "all" ? true : submittedFilter === "yes" ? activity.has(p.id) : !activity.has(p.id),
+    )
+    .filter((p) => (favoritesOnly ? favorites.has(p.id) : true))
+    .filter((p) =>
+      referralsOnly ? Number(referralBy.get(p.id)?.invited ?? 0) > 0 : true,
+    )
+    .filter((p) =>
+      !query
+        ? true
+        : `${p.full_name} ${p.email} ${p.reddit_profile_url} ${(p.niches ?? []).join(" ")}`
+            .toLowerCase()
+            .includes(query),
+    )
+    .sort((a, b) => {
+      const fa = favorites.has(a.id) ? 1 : 0;
+      const fb = favorites.has(b.id) ? 1 : 0;
+      if (fa !== fb) return fb - fa;
+      const la = activity.get(a.id)?.last.created_at;
+      const lb = activity.get(b.id)?.last.created_at;
+      if (la && lb) return new Date(lb).getTime() - new Date(la).getTime();
+      if (la) return -1;
+      if (lb) return 1;
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    });
+
+  const exportProfilesCsv = () => {
+    const rows = visibleProfiles.length ? visibleProfiles : (profiles ?? []);
+    const headers = [
+      "email",
+      "full_name",
+      "reddit_profile_url",
+      "phone_number",
+      "wallet_address",
+      "status",
+      "niches",
+      "submissions",
+      "invited",
+      "validated_invites",
+      "referral_owed_usd",
+      "email_notifications",
+      "created_at",
+    ];
+    const escape = (value: unknown) => `"${String(value ?? "").replace(/"/g, '""')}"`;
+    const csv = [
+      headers.join(","),
+      ...rows.map((p) =>
+        [
+          p.email,
+          p.full_name,
+          p.reddit_profile_url,
+          p.phone_number,
+          p.wallet_address,
+          p.status,
+          (p.niches ?? []).join(" | "),
+          activity.get(p.id)?.total ?? 0,
+          Number(referralBy.get(p.id)?.invited ?? 0),
+          Number(referralBy.get(p.id)?.validated ?? 0),
+          Number(referralBy.get(p.id)?.earned ?? 0).toFixed(2),
+          p.email_notifications ? "yes" : "no",
+          p.created_at,
+        ]
+          .map(escape)
+          .join(","),
+      ),
+    ].join("\r\n");
+
+    const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `taskreddit-accounts-${new Date().toISOString().slice(0, 10)}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+    toast.success(`${rows.length} account${rows.length > 1 ? "s" : ""} exported`);
+  };
+
+
+  const profileStats = {
+    total: profiles?.length ?? 0,
+    pending: profiles?.filter((profile) => profile.status === "pending").length ?? 0,
+    accepted: profiles?.filter((profile) => profile.status === "accepted").length ?? 0,
+    rejected: profiles?.filter((profile) => profile.status === "rejected").length ?? 0,
+  };
+
+  const liveMissions = (missions ?? []).filter((mission) => mission.is_active && !mission.is_locked);
+  const submissionStats = {
+    total: submissions?.length ?? 0,
+    posts: submissions?.filter((submission) => submission.missions?.type === "post").length ?? 0,
+    comments: submissions?.filter((submission) => submission.missions?.type === "comment").length ?? 0,
+    pending: submissions?.filter((submission) => submission.status === "pending").length ?? 0,
+    approved: submissions?.filter((submission) => submission.status === "approved").length ?? 0,
+    rejected: submissions?.filter((submission) => submission.status === "rejected").length ?? 0,
+  };
+  const visibleSubmissions = (submissions ?? []).filter((submission) => {
+    const notRejected = submission.status !== "rejected";
+    const matchesType = submissionTypeFilter === "all" || submission.missions?.type === submissionTypeFilter;
+    const matchesStatus = submissionStatusFilter === "all" || submission.status === submissionStatusFilter;
+    return notRejected && matchesType && matchesStatus;
+  });
+
+  async function saveMission() {
+    if (!draft) return;
+
+    const communityUrl = (draft.community_url ?? "").trim();
+    const targetPostUrl = (draft.target_post_url ?? "").trim();
+    const subreddit = extractRedditSubreddit(draft.type === "post" ? communityUrl : targetPostUrl);
+    const payload = {
+      type: draft.type,
+      title: (draft.title ?? "").trim(),
+      subreddit,
+      community_url: draft.type === "post" ? communityUrl : "",
+      payout: Number(draft.payout ?? (draft.type === "post" ? 5 : 3.5)),
+      post_title: draft.post_title ?? null,
+      post_body: draft.post_body ?? null,
+      flair: draft.flair ?? null,
+      target_post_url: draft.type === "comment" ? targetPostUrl : null,
+      comment_text: draft.comment_text ?? null,
+      is_active: draft.is_active ?? true,
+    };
+    if (!payload.title || !payload.subreddit) {
+      return toast.error(
+        draft.type === "post"
+          ? "Enter a valid Reddit community link."
+          : "Enter a valid Reddit post link.",
+      );
+    }
+
+    const { error } = draft.id
+      ? await supabase.from("missions").update(payload).eq("id", draft.id)
+      : await supabase.from("missions").insert(payload);
+    if (error) return toast.error(error.message);
+    toast.success("Mission saved.");
+    setDraft(null);
+    qc.invalidateQueries({ queryKey: ["missions"] });
+  }
+
+  async function removeMission(id: string) {
+    const { error } = await supabase.from("missions").delete().eq("id", id);
+    if (error) return toast.error(error.message);
+    qc.invalidateQueries({ queryKey: ["missions"] });
+    toast.success("Mission deleted.");
+  }
+
+  async function reviewSubmission(id: string, status: "approved" | "rejected") {
+    const { error } = await supabase
+      .from("submissions")
+      .update({ status, reviewed_at: new Date().toISOString() })
+      .eq("id", id);
+    if (error) return toast.error(error.message);
+    qc.invalidateQueries({ queryKey: ["submissions"] });
+    qc.invalidateQueries({ queryKey: ["missions"] });
+    toast.success(status === "approved" ? "Submission approved." : "Submission rejected.");
+  }
+
+  async function markPaid(id: string) {
+    const { error } = await supabase.from("submissions").update({ paid: true }).eq("id", id);
+    if (error) return toast.error(error.message);
+    qc.invalidateQueries({ queryKey: ["submissions"] });
+  }
+
+  // The editor preview's server has no Talentir key: in that case the request is sent
+  // to the live site, which runs the same admin checks with your sign-in token.
+  async function viaLiveSite<T>(
+    action: "pay" | "refresh",
+    submissionId: string,
+    extra: Record<string, string> = {},
+  ): Promise<T> {
+    const { data } = await supabase.auth.getSession();
+    const token = data.session?.access_token;
+    if (!token) throw new Error("Please sign in again.");
+    let r: Response;
+    try {
+      r = await fetch(`${LIVE_SITE}/api/public/talentir-action`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ action, submissionId, ...extra }),
+      });
+    } catch {
+      throw new Error(
+        "Could not reach the live site from the preview. Publish the site, or pay from the live site's admin page.",
+      );
+    }
+    const j = (await r.json().catch(() => null)) as ({ ok?: boolean; error?: string } & T) | null;
+    if (!r.ok || !j?.ok) {
+      if (r.status === 404) throw new Error("Publish the site once, then try again.");
+      throw new Error(j?.error ?? `Talentir request failed (${r.status}).`);
+    }
+    return j;
+  }
+
+  function isNotConnected(e: unknown) {
+    return e instanceof Error && e.message.includes("Talentir is not connected");
+  }
+
+  type PayStep = { step: "approve"; url: string; email: string } | { step: "sent"; status: string; email: string };
+
+  // Step 1 opens Talentir's approval screen; once approved there, Talentir sends us back here
+  // and step 2 emails the member the claim link.
+  async function runTalentirPay(submissionId: string, returning = false) {
+    setPaying(true);
+    try {
+      const returnUrl = `${window.location.origin}/admin?talentir=${submissionId}`;
+      let res: PayStep;
+      try {
+        res = (await payTalentirFn({ data: { submissionId, returnUrl } })) as PayStep;
+      } catch (e) {
+        if (!isNotConnected(e)) throw e;
+        res = await viaLiveSite<PayStep>("pay", submissionId, { returnUrl });
+      }
+      if (res.step === "approve") {
+        if (returning) {
+          toast.message("This payment is not approved on Talentir yet. Click “Finish payment” to approve it.");
+          return;
+        }
+        toast.message("Opening Talentir to approve this payment…");
+        window.location.href = res.url;
+        return;
+      }
+      toast.success(`Payment sent — Talentir emailed a claim link to ${res.email}.`);
+      setPendingPay(null);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Talentir payment failed.");
+    } finally {
+      setPaying(false);
+      qc.invalidateQueries({ queryKey: ["submissions"] });
+    }
+  }
+
+  async function confirmTalentirPay() {
+    if (!pendingPay) return;
+    await runTalentirPay(pendingPay.id);
+  }
+
+  async function refreshTalentir(id: string) {
+    try {
+      let res: { status: string };
+      try {
+        res = await refreshTalentirFn({ data: { submissionId: id } });
+      } catch (e) {
+        if (!isNotConnected(e)) throw e;
+        res = await viaLiveSite<{ status: string }>("refresh", id);
+      }
+      toast.success(`Talentir status: ${talentirStatusLabel(res.status)}`);
+      qc.invalidateQueries({ queryKey: ["submissions"] });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not refresh status.");
+    }
+  }
+
+  async function setAccountStatus(id: string, status: "accepted" | "rejected" | "pending") {
+    const { error } = await supabase.from("profiles").update({ status }).eq("id", id);
+    if (error) return toast.error(error.message);
+    qc.invalidateQueries({ queryKey: ["profiles"] });
+    toast.success("Status updated.");
+  }
+
+  return (
+    <DashboardLayout
+      title="Administration"
+      description={`Total amount to pay: $${formatAmount(toPay)} · Referral rewards owed: $${referralOwed.toFixed(2)}`}
+    >
+      <section aria-label="Account overview" className="mb-7">
+        <div className="mb-3 flex items-end justify-between gap-3">
+          <div>
+            <p className="text-sm font-semibold text-foreground">Account overview</p>
+            <p className="mt-0.5 text-xs text-muted-foreground">Registration and verification status at a glance.</p>
+          </div>
+          <span className="hidden text-xs text-muted-foreground sm:inline">Live totals</span>
+        </div>
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+          <StatusMetric icon={UserRound} label="Registered" value={profileStats.total} tone="neutral" />
+          <StatusMetric icon={Clock3} label="Pending review" value={profileStats.pending} tone="warning" />
+          <StatusMetric icon={CheckCircle2} label="Accepted" value={profileStats.accepted} tone="success" />
+          <StatusMetric icon={XCircle} label="Rejected" value={profileStats.rejected} tone="destructive" />
+        </div>
+      </section>
+
+      <Tabs defaultValue="missions">
+        <TabsList>
+          <TabsTrigger value="missions">Missions</TabsTrigger>
+          <TabsTrigger value="submissions">Submissions</TabsTrigger>
+          <TabsTrigger value="users">Users ({profileStats.total})</TabsTrigger>
+          <TabsTrigger value="referrals">Referrals</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="missions" className="mt-6 space-y-4">
+          <div className="flex flex-wrap gap-2">
+            <Button size="sm" onClick={() => setDraft({ type: "comment", payout: 3.5 })}>
+              <Plus className="mr-1 h-4 w-4" /> Comment mission
+            </Button>
+            <Button size="sm" variant={missionFilter === "live" ? "default" : "outline"} onClick={() => setMissionFilter("live")}>
+              Live only ({liveMissions.length})
+            </Button>
+            <Button size="sm" variant={missionFilter === "all" ? "default" : "outline"} onClick={() => setMissionFilter("all")}>
+              All ({missions?.length ?? 0})
+            </Button>
+          </div>
+          <div className="grid gap-3">
+            {(missions ?? [])
+              .filter((m) => (missionFilter === "live" ? m.is_active && !m.is_locked : true))
+              .map((m) => (
+                <div key={m.id} className="panel flex items-center justify-between gap-3 p-4">
+                  <div className="min-w-0">
+                    <div className="truncate font-medium">{m.title}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {m.type === "post" ? "Post" : "Comment"} · r/{m.subreddit} · $
+                      {formatAmount(m.payout)} {m.is_active ? "" : "· inactive"} {m.is_locked ? "· locked" : ""}
+                    </div>
+                  </div>
+                  <div className="flex shrink-0 gap-1">
+                    <Button size="icon" variant="ghost" onClick={() => setDraft(m as Draft)}>
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button size="icon" variant="ghost" onClick={() => removeMission(m.id)}>
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+          </div>
+          {!((missions ?? []).filter((m) => (missionFilter === "live" ? m.is_active && !m.is_locked : true)).length) ? (
+            <div className="panel p-8 text-center text-sm text-muted-foreground">
+              {missionFilter === "live" ? "No live missions." : "No missions yet."}
+            </div>
+          ) : null}
+        </TabsContent>
+
+
+        <TabsContent value="submissions" className="mt-6 space-y-4">
+          <section aria-label="Submission overview" className="grid grid-cols-2 gap-3 lg:grid-cols-3">
+            <SubmissionMetric icon={Radio} label="Live missions" value={liveMissions.length} detail={`${liveMissions.filter((mission) => mission.type === "comment").length} comments`} tone="primary" />
+            <SubmissionMetric icon={MessageSquare} label="Comment submissions" value={submissionStats.comments} detail={`${submissionStats.pending} waiting for review`} tone="neutral" />
+            <SubmissionMetric icon={CircleDollarSign} label="Awaiting review" value={submissionStats.pending} detail={`${submissionStats.total} total submissions`} tone="warning" />
+          </section>
+
+          <div className="panel flex flex-col gap-3 p-3 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <p className="text-sm font-semibold text-foreground">Submission queue</p>
+              <p className="text-xs text-muted-foreground">Review links submitted by your Reddit workers.</p>
+            </div>
+            <div className="flex gap-1 overflow-x-auto pb-0.5">
+              {(["all", "comment"] as const).map((filter) => (
+                <Button key={filter} size="sm" variant={submissionTypeFilter === filter ? "default" : "outline"} className="shrink-0" onClick={() => setSubmissionTypeFilter(filter)}>
+                  {filter === "all" ? `All (${submissionStats.total})` : `Comments (${submissionStats.comments})`}
+                </Button>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex gap-1 overflow-x-auto pb-0.5">
+            {(["all", "pending", "approved", "rejected"] as const).map((filter) => (
+              <Button key={filter} size="sm" variant={submissionStatusFilter === filter ? "secondary" : "ghost"} className="shrink-0" onClick={() => setSubmissionStatusFilter(filter)}>
+                {filter.charAt(0).toUpperCase() + filter.slice(1)}
+                {filter !== "all" ? ` (${submissionStats[filter]})` : ` (${submissionStats.total})`}
+              </Button>
+            ))}
+          </div>
+
+          {visibleSubmissions.map((s) => (
+            <div key={s.id} className="panel space-y-3 p-4 transition-colors hover:border-primary/40">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div className="flex min-w-0 items-start gap-3">
+                  <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                    {s.missions?.type === "post" ? <FileText className="h-4 w-4" /> : <MessageSquare className="h-4 w-4" />}
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <div className="truncate font-medium">{s.missions?.title ?? "Mission"}</div>
+                      <Badge variant="outline" className="capitalize">{s.missions?.type ?? "mission"}</Badge>
+                    </div>
+                    <div className="mt-1 truncate text-xs text-muted-foreground">
+                      {s.profile?.full_name || "Unknown worker"} · {s.profile?.email} · Submitted {new Date(s.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="font-display text-sm font-semibold text-primary">${formatAmount(s.amount)}</span>
+                  <Badge variant={s.status === "pending" ? "secondary" : s.status === "approved" ? "default" : "destructive"}>
+                    {s.status === "pending" ? "Pending" : s.status === "approved" ? "Approved" : "Rejected"}
+                  </Badge>
+                </div>
+              </div>
+              <a href={s.submitted_url} target="_blank" rel="noopener noreferrer" className="block break-all rounded-md border border-border bg-background/40 px-3 py-2 text-xs text-primary hover:underline">
+                {s.submitted_url}
+              </a>
+              <div className="flex flex-wrap items-center gap-2">
+                {s.status === "pending" ? <>
+                  <Button size="sm" onClick={() => reviewSubmission(s.id, "approved")}>Approve</Button>
+                  <Button size="sm" variant="outline" onClick={() => reviewSubmission(s.id, "rejected")}>Reject</Button>
+                </> : null}
+                {s.status === "approved" && !s.paid ? <>
+                  <Button
+                    size="sm"
+                    onClick={() =>
+                      setPendingPay({
+                        id: s.id,
+                        name: s.profile?.full_name || "Unknown worker",
+                        email: s.profile?.email ?? "",
+                        title: s.missions?.title ?? "Mission",
+                        amount: Number(s.amount),
+                        url: s.submitted_url,
+                      })
+                    }
+                  >
+                    <Send className="h-4 w-4" />
+                    {s.talentir_payout_id ? "Finish Talentir payment" : "Pay with Talentir"}
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={() => markPaid(s.id)}>Mark as paid (manual)</Button>
+                </> : null}
+                {s.paid && s.talentir_payout_id ? <>
+                  <span className="text-xs text-success">
+                    Paid via Talentir · {talentirStatusLabel(s.talentir_status)}
+                  </span>
+                  <Button size="sm" variant="ghost" className="h-7 px-2 text-xs" onClick={() => refreshTalentir(s.id)}>
+                    <RefreshCw className="h-3 w-3" />
+                    Refresh
+                  </Button>
+                </> : s.paid ? <span className="text-xs text-success">Paid</span> : null}
+              </div>
+            </div>
+          ))}
+          {!visibleSubmissions.length ? <div className="panel p-8 text-center text-sm text-muted-foreground">No submissions match these filters.</div> : null}
+        </TabsContent>
+
+        <TabsContent value="users" className="mt-6 grid gap-3">
+          <div className="panel flex flex-wrap items-center gap-3 p-3">
+            <Input
+              value={userSearch}
+              onChange={(e) => setUserSearch(e.target.value)}
+              placeholder="Search by name, email or Reddit profile"
+              className="max-w-none sm:max-w-xs"
+            />
+            <div className="flex gap-1 overflow-x-auto pb-0.5">
+              {(["all", "pending", "accepted", "rejected"] as const).map((f) => (
+                <Button
+                  key={f}
+                  size="sm"
+                  variant={userFilter === f ? "default" : "outline"}
+                  onClick={() => setUserFilter(f)}
+                  className="shrink-0"
+                >
+                  {f === "all" ? `All (${profileStats.total})` : f === "pending" ? `Pending (${profileStats.pending})` : f === "accepted" ? `Accepted (${profileStats.accepted})` : `Rejected (${profileStats.rejected})`}
+                </Button>
+              ))}
+            </div>
+            <div className="flex gap-1 overflow-x-auto pb-0.5">
+              {(["all", "yes", "no"] as const).map((f) => (
+                <Button
+                  key={f}
+                  size="sm"
+                  variant={submittedFilter === f ? "default" : "outline"}
+                  onClick={() => setSubmittedFilter(f)}
+                  className="shrink-0"
+                >
+                  {f === "all"
+                    ? "Any activity"
+                    : f === "yes"
+                      ? `Has submitted (${(profiles ?? []).filter((p) => activity.has(p.id)).length})`
+                      : `Never submitted (${(profiles ?? []).filter((p) => !activity.has(p.id)).length})`}
+                </Button>
+              ))}
+            </div>
+            <Button
+              size="sm"
+              variant={favoritesOnly ? "default" : "outline"}
+              onClick={() => setFavoritesOnly((v) => !v)}
+              className="shrink-0 gap-1"
+            >
+              <Star className={"h-3.5 w-3.5 " + (favoritesOnly ? "fill-current" : "")} />
+              Favorites ({favorites.size})
+            </Button>
+            <Button
+              size="sm"
+              variant={referralsOnly ? "default" : "outline"}
+              onClick={() => setReferralsOnly((v) => !v)}
+              className="shrink-0 gap-1"
+              title="Show only members who invited someone"
+            >
+              <Gift className="h-3.5 w-3.5" />
+              Invited ({(profiles ?? []).filter((p) => Number(referralBy.get(p.id)?.invited ?? 0) > 0).length})
+            </Button>
+            <Button size="sm" variant="outline" className="shrink-0 gap-1" onClick={exportProfilesCsv}>
+              <Download className="h-3.5 w-3.5" />
+              Export CSV
+            </Button>
+            <span className="text-xs text-muted-foreground sm:ml-auto">
+              Showing {visibleProfiles.length} of {profileStats.total}
+            </span>
+          </div>
+
+
+          {visibleProfiles.map((p) => {
+            const act = activity.get(p.id);
+            const isFav = favorites.has(p.id);
+            const ref = referralBy.get(p.id);
+            const owed = Number(ref?.earned ?? 0);
+            return (
+              <div key={p.id} className="panel flex flex-wrap items-center justify-between gap-3 p-4">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      aria-label={isFav ? "Remove from favorites" : "Add to favorites"}
+                      title={isFav ? "Remove from favorites" : "Add to favorites"}
+                      onClick={() => toggleFavorite.mutate({ profileId: p.id, favorite: !isFav })}
+                      className="shrink-0 text-muted-foreground transition-colors hover:text-primary"
+                    >
+                      <Star className={"h-4 w-4 " + (isFav ? "fill-primary text-primary" : "")} />
+                    </button>
+                    <div className="truncate font-medium">{p.full_name || "—"}</div>
+                  </div>
+                  <div className="truncate text-xs text-muted-foreground">{p.email}</div>
+                  <a
+                    href={p.reddit_profile_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block truncate text-xs text-primary hover:underline"
+                  >
+                    {p.reddit_profile_url}
+                  </a>
+                  <div className="truncate text-xs text-muted-foreground">Wallet: {p.wallet_address || "not set"}</div>
+                  <div className="truncate text-xs text-muted-foreground">
+                    WhatsApp: {p.phone_number || "not set"}
+                  </div>
+                  {p.niches?.length ? (
+                    <div className="mt-2 flex flex-wrap items-center gap-1">
+                      <span className="text-[10px] uppercase tracking-wide text-muted-foreground">Topics:</span>
+                      {p.niches.map((n) => (
+                        <Badge key={n} variant="secondary" className="text-[10px]">
+                          {n}
+                        </Badge>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="mt-2 text-[10px] uppercase tracking-wide text-muted-foreground">
+                      Topics: none
+                    </div>
+                  )}
+
+                  <div className="mt-2 text-xs text-muted-foreground">Joined {fmtDate(p.created_at)}</div>
+                  {act ? (
+                    <div className="text-xs text-muted-foreground">
+                      Last mission {fmtDate(act.last.created_at)} —{" "}
+                      <span className="text-foreground">{act.last.missions?.title ?? "Mission"}</span>{" "}
+                      <span
+                        className={
+                          act.last.status === "approved"
+                            ? "text-success"
+                            : act.last.status === "rejected"
+                              ? "text-destructive"
+                              : ""
+                        }
+                      >
+                        ({act.last.status})
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="text-xs text-muted-foreground">No mission yet</div>
+                  )}
+                  <div className="text-xs text-muted-foreground">
+                    {act?.approved ?? 0} approved · ${(act?.earned ?? 0).toFixed(2)} earned
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    <Gift className="mr-1 inline h-3 w-3 text-primary" />
+                    {Number(ref?.invited ?? 0)} invited
+                    {Number(ref?.validated ?? 0) > 0 ? ` · ${Number(ref?.validated)} validated` : ""}
+                  </div>
+                </div>
+                <div className="flex shrink-0 flex-col items-end gap-2">
+                  <div
+                    className={
+                      "flex min-w-28 flex-col items-center rounded-xl border px-4 py-2 " +
+                      (act
+                        ? "border-primary/40 bg-primary/10"
+                        : "border-border bg-background/40")
+                    }
+                    title="Number of missions submitted"
+                  >
+                    <span className="font-display text-3xl font-bold text-primary">
+                      {act?.total ?? 0}
+                    </span>
+                    <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                      {act && act.total === 1 ? "submission" : "submissions"}
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap items-center justify-end gap-2">
+                    {owed > 0 ? (
+                      <Badge variant="secondary" className="text-primary">
+                        ${owed.toFixed(2)} owed
+                      </Badge>
+                    ) : null}
+                    <Badge variant={act ? "default" : "outline"} className={act ? "" : "text-muted-foreground"}>
+                      {act ? "Active" : "Never submitted"}
+                    </Badge>
+                    <Badge variant={p.status === "accepted" ? "default" : p.status === "rejected" ? "destructive" : "secondary"}>
+                      {p.status === "accepted" ? "Accepted" : p.status === "rejected" ? "Rejected" : "Pending"}
+                    </Badge>
+                    <Button size="sm" onClick={() => setAccountStatus(p.id, "accepted")}>
+                      Accept
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={() => setAccountStatus(p.id, "rejected")}>
+                      Reject
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={() => setPendingDelete({ id: p.id, label: p.full_name || p.email || "this member" })}
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                      Delete
+                    </Button>
+                  </div>
+
+                </div>
+              </div>
+            );
+          })}
+          {!visibleProfiles.length ? (
+            <div className="panel p-8 text-center text-sm text-muted-foreground">No member found.</div>
+          ) : null}
+        </TabsContent>
+
+        <TabsContent value="referrals" className="mt-6 space-y-4">
+          {(() => {
+            const rows = referralRows ?? [];
+            const totalInvited = rows.reduce((s, r) => s + Number(r.invited), 0);
+            const totalValidated = rows.reduce((s, r) => s + Number(r.validated), 0);
+            const totalMissions = rows.reduce((s, r) => s + Number(r.approved_missions), 0);
+            const totalEarned = rows.reduce((s, r) => s + Number(r.earned), 0);
+            return (
+              <>
+                <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+                  <StatusMetric icon={UserRound} label="Invited signups" value={totalInvited} tone="neutral" />
+                  <StatusMetric icon={CheckCircle2} label="Validated" value={totalValidated} tone="success" />
+                  <StatusMetric icon={MessageSquare} label="Approved missions" value={totalMissions} tone="neutral" />
+                  <StatusMetric icon={CircleDollarSign} label="Referral rewards owed ($)" value={Number(totalEarned.toFixed(2))} tone="warning" />
+                </div>
+                <div className="panel divide-y divide-border">
+                  {rows.length === 0 ? (
+                    <div className="p-8 text-center text-sm text-muted-foreground">No referrals yet.</div>
+                  ) : (
+                    rows
+                      .slice()
+                      .sort((a, b) => Number(b.earned) - Number(a.earned))
+                      .map((r) => (
+                        <div key={r.referrer_id} className="flex flex-wrap items-center justify-between gap-3 p-4 text-sm">
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2 font-medium">
+                              <Gift className="h-4 w-4 text-primary" /> u/{r.username || "member"}
+                            </div>
+                            <div className="mt-1 truncate text-xs text-muted-foreground">
+                              Wallet: {r.wallet || "not set"}
+                            </div>
+                          </div>
+                          <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
+                            <span>{r.invited} invited</span>
+                            <span>{r.validated} validated</span>
+                            <span>{r.approved_missions} missions</span>
+                            <Badge variant="secondary" className="text-primary">
+                              ${Number(r.earned).toFixed(2)} owed
+                            </Badge>
+                          </div>
+                        </div>
+                      ))
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Rewards: $1.00 per validated invitee + $0.50 per approved invitee mission. Pay them in USDC together
+                  with mission payouts.
+                </p>
+              </>
+            );
+          })()}
+        </TabsContent>
+
+      </Tabs>
+
+      <Dialog open={!!pendingDelete} onOpenChange={(o) => !o && setPendingDelete(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Delete this account?</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            {pendingDelete?.label} will be permanently removed, along with their submissions and history. This
+            cannot be undone.
+          </p>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setPendingDelete(null)}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              disabled={deleteMember.isPending}
+              onClick={() => {
+                if (!pendingDelete) return;
+                deleteMember.mutate(pendingDelete.id, {
+                  onSuccess: () => {
+                    toast.success("Account deleted.");
+                    setPendingDelete(null);
+                  },
+                  onError: (e) => toast.error(e instanceof Error ? e.message : "Deletion failed."),
+                });
+              }}
+            >
+              {deleteMember.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+              Delete permanently
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!pendingPay} onOpenChange={(o) => !o && !paying && setPendingPay(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Pay this mission with Talentir?</DialogTitle>
+          </DialogHeader>
+          {pendingPay ? (
+            <div className="space-y-3 text-sm">
+              <div className="rounded-lg border border-border bg-background/60 p-3">
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-muted-foreground">Member</span>
+                  <span className="truncate font-medium">{pendingPay.name}</span>
+                </div>
+                <div className="mt-1 flex items-center justify-between gap-3">
+                  <span className="text-muted-foreground">Email</span>
+                  <span className="truncate font-medium">{pendingPay.email || "—"}</span>
+                </div>
+                <div className="mt-1 flex items-center justify-between gap-3">
+                  <span className="text-muted-foreground">Mission</span>
+                  <span className="truncate font-medium">{pendingPay.title}</span>
+                </div>
+                <div className="mt-1 flex items-center justify-between gap-3">
+                  <span className="text-muted-foreground">Amount</span>
+                  <span className="font-display text-base font-semibold text-primary">${pendingPay.amount.toFixed(2)} USD</span>
+                </div>
+              </div>
+              <a href={pendingPay.url} target="_blank" rel="noopener noreferrer" className="block break-all text-xs text-primary hover:underline">
+                Check the comment one last time ↗
+              </a>
+              <p className="text-xs text-muted-foreground">
+                You will be taken to Talentir to approve this payment (sign in there if asked). Once approved, you come back here and Talentir emails the member a link to claim it (bank, PayPal or crypto).
+              </p>
+            </div>
+          ) : null}
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" disabled={paying} onClick={() => setPendingPay(null)}>
+              Cancel
+            </Button>
+            <Button disabled={paying || !pendingPay?.email} onClick={confirmTalentirPay}>
+              {paying ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+              Continue to Talentir
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+
+
+      <Dialog open={!!draft} onOpenChange={(o) => !o && setDraft(null)}>
+        <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>
+              {draft?.id ? "Edit mission" : draft?.type === "post" ? "New post mission" : "New comment mission"}
+            </DialogTitle>
+          </DialogHeader>
+          {draft ? (
+            <div className="space-y-4">
+              <FieldInput label="Mission name" value={draft.title ?? ""} onChange={(v) => setDraft({ ...draft, title: v })} />
+              {draft.type === "post" ? (
+                <FieldInput
+                  label="Community link"
+                  value={draft.community_url ?? ""}
+                  onChange={(v) => setDraft({ ...draft, community_url: v })}
+                  placeholder="https://www.reddit.com/r/..."
+                />
+              ) : (
+                <FieldInput
+                  label="Reddit post link"
+                  value={draft.target_post_url ?? ""}
+                  onChange={(v) => setDraft({ ...draft, target_post_url: v })}
+                  placeholder="https://www.reddit.com/r/.../comments/..."
+                />
+              )}
+              <FieldInput label="Payout ($)" type="number" value={String(draft.payout ?? "")} onChange={(v) => setDraft({ ...draft, payout: Number(v) })} />
+
+              {draft.type === "post" ? (
+                <>
+                  <FieldInput label="Exact post title" value={draft.post_title ?? ""} onChange={(v) => setDraft({ ...draft, post_title: v })} />
+                  <FieldArea label="Full body" value={draft.post_body ?? ""} onChange={(v) => setDraft({ ...draft, post_body: v })} />
+                  <FieldInput label="Flair" value={draft.flair ?? ""} onChange={(v) => setDraft({ ...draft, flair: v })} />
+                </>
+              ) : (
+                <FieldArea label="Exact comment" value={draft.comment_text ?? ""} onChange={(v) => setDraft({ ...draft, comment_text: v })} />
+              )}
+              <Button className="w-full" onClick={saveMission}>
+                Save
+              </Button>
+            </div>
+          ) : null}
+        </DialogContent>
+      </Dialog>
+    </DashboardLayout>
+  );
+}
+
+function FieldInput({
+  label,
+  value,
+  onChange,
+  type = "text",
+  placeholder,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  type?: string;
+  placeholder?: string;
+}) {
+  return (
+    <div className="space-y-1.5">
+      <Label>{label}</Label>
+      <Input
+        type={type}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        maxLength={300}
+      />
+    </div>
+  );
+}
+
+function FieldArea({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+  return (
+    <div className="space-y-1.5">
+      <Label>{label}</Label>
+      <Textarea value={value} onChange={(e) => onChange(e.target.value)} rows={5} maxLength={5000} />
+    </div>
+  );
+}
+
+type MetricTone = "neutral" | "warning" | "success" | "destructive";
+
+function StatusMetric({
+  icon: Icon,
+  label,
+  value,
+  tone,
+}: {
+  icon: ComponentType<{ className?: string }>;
+  label: string;
+  value: number;
+  tone: MetricTone;
+}) {
+  const toneClasses: Record<MetricTone, { icon: string; value: string; border: string }> = {
+    neutral: { icon: "text-primary", value: "text-foreground", border: "border-border" },
+    warning: { icon: "text-warning", value: "text-warning", border: "border-warning/30" },
+    success: { icon: "text-success", value: "text-success", border: "border-success/30" },
+    destructive: { icon: "text-destructive", value: "text-destructive", border: "border-destructive/30" },
+  };
+  const colors = toneClasses[tone];
+
+  return (
+    <div className={`panel relative overflow-hidden p-4 ${colors.border}`}>
+      <div className="flex items-start justify-between gap-2">
+        <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">{label}</span>
+        <Icon className={`h-4 w-4 shrink-0 ${colors.icon}`} aria-hidden />
+      </div>
+      <div className={`mt-2 font-display text-3xl font-bold ${colors.value}`}>{value}</div>
+    </div>
+  );
+}
+
+type SubmissionMetricTone = "primary" | "neutral" | "warning";
+
+function SubmissionMetric({
+  icon: Icon,
+  label,
+  value,
+  detail,
+  tone,
+}: {
+  icon: ComponentType<{ className?: string }>;
+  label: string;
+  value: number;
+  detail: string;
+  tone: SubmissionMetricTone;
+}) {
+  const toneClasses: Record<SubmissionMetricTone, { icon: string; value: string; border: string }> = {
+    primary: { icon: "text-primary", value: "text-primary", border: "border-primary/30" },
+    neutral: { icon: "text-muted-foreground", value: "text-foreground", border: "border-border" },
+    warning: { icon: "text-warning", value: "text-warning", border: "border-warning/30" },
+  };
+  const colors = toneClasses[tone];
+
+  return (
+    <div className={`panel relative overflow-hidden p-4 ${colors.border}`}>
+      <div className="flex items-start justify-between gap-2">
+        <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">{label}</span>
+        <Icon className={`h-4 w-4 shrink-0 ${colors.icon}`} aria-hidden />
+      </div>
+      <div className={`mt-2 font-display text-3xl font-bold ${colors.value}`}>{value}</div>
+      <p className="mt-1 truncate text-xs text-muted-foreground">{detail}</p>
+    </div>
+  );
+}
