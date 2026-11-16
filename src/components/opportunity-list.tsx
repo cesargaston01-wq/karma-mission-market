@@ -26,7 +26,9 @@ import {
   useSession,
   useSubmitMission,
   type Mission,
+  X_STATUS_URL,
 } from "@/lib/data";
+import { Bookmark, Heart, MessageCircle, Repeat2 } from "lucide-react";
 
 
 
@@ -35,31 +37,29 @@ import {
  * They are never fetched from the database: they only prove that
  * opportunities exist before signing up.
  */
-const PREVIEW_SUBREDDITS = [
-  "personalfinance",
-  "Entrepreneur",
-  "fitness",
-  "SaaS",
-  "productivity",
-  "startups",
-  "cryptocurrency",
-  "webdev",
-  "marketing",
-  "sidehustle",
+const PREVIEW_HANDLES = [
+  "lumenapp",
+  "shipfast_hq",
+  "orbitai",
+  "nordwallet",
+  "pixelforge",
+  "tallyhq",
+  "focusmode",
+  "glyphstudio",
+  "relaydev",
+  "atlas_os",
 ];
 
 function buildPreviewMissions(type: "post" | "comment"): Mission[] {
-  return PREVIEW_SUBREDDITS.map(
+  return PREVIEW_HANDLES.map(
     (subreddit, i) =>
       ({
         id: `preview-${type}-${i}`,
         type,
         title:
-          type === "post"
-            ? `Sponsored post opportunity in r/${subreddit}`
-            : `Comment opportunity in r/${subreddit}`,
+`Launch day task pack for @${subreddit}`,
         subreddit,
-        payout: type === "post" ? 5 : 3.5,
+        payout: 5,
         is_active: true,
         is_locked: false,
         reserved_by: null,
@@ -90,7 +90,7 @@ function PendingState({ status, reason }: { status?: string; reason?: string | n
         <h2 className="mt-4 text-lg font-semibold">Account rejected</h2>
         <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
           {reason ||
-            "Your Reddit account doesn't meet the requirements (3 months old, 100+ karma, overall quality)."}
+            "Your X account doesn't meet the requirements (6+ months old, real active profile, clean reputation)."}
         </p>
       </div>
     );
@@ -100,7 +100,7 @@ function PendingState({ status, reason }: { status?: string; reason?: string | n
       <Clock className="mx-auto h-6 w-6 text-warning" />
       <h2 className="mt-4 text-lg font-semibold">Account pending review</h2>
       <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
-        We're reviewing your Reddit account (3 months old, 100+ karma, overall quality). Missions
+        We're reviewing your X account (6+ months old, real active profile, clean reputation). Missions
         will appear here as soon as you're approved.
       </p>
     </div>
@@ -191,7 +191,7 @@ export function MissionBrowser({
     if (!selected) return;
     reserve.mutate(selected.id, {
       onSuccess: () =>
-        toast.success("Mission reserved for 10 minutes. The Reddit link is now unlocked."),
+        toast.success("Mission reserved for 10 minutes. The X post is now unlocked."),
       onError: (err) => {
         toast.error(err.message);
         // Someone else got it first: close the window and refresh the list.
@@ -213,8 +213,8 @@ export function MissionBrowser({
     e.preventDefault();
     if (!selected) return;
     const clean = url.trim();
-    if (!/^https?:\/\/(www\.|old\.|new\.)?reddit\.com\/.+/i.test(clean)) {
-      toast.error("Enter a valid Reddit link (https://reddit.com/…).");
+    if (!X_STATUS_URL.test(clean)) {
+      toast.error("Enter the link to your reply on X (https://x.com/…/status/…).");
       return;
     }
     submit.mutate(
@@ -243,18 +243,18 @@ export function MissionBrowser({
             It's reserved for you for 10 minutes and disappears for everyone else.
           </li>
           <li className="rounded-lg border border-border bg-background/60 p-2.5">
-            <span className="font-semibold text-foreground">2. Open the unlocked link</span>
+            <span className="font-semibold text-foreground">2. Complete the 4 actions</span>
             <br />
-            The Reddit link and the comment only appear once the mission is yours.
+            The X post and your reply text only appear once the mission is yours.
           </li>
           <li className="rounded-lg border border-border bg-background/60 p-2.5">
-            <span className="font-semibold text-foreground">3. Submit your link</span>
+            <span className="font-semibold text-foreground">3. Submit your reply link</span>
             <br />
-            Paste your comment link before the 10 minutes run out.
+            Paste the link to your reply before the 10 minutes run out.
           </li>
         </ol>
         <p className="mt-3 text-xs font-medium text-destructive">
-          A comment posted without taking the mission first will not be paid.
+          Actions done without taking the mission first will not be paid.
         </p>
       </div>
       {canSubmit ? (
@@ -301,7 +301,8 @@ export function MissionBrowser({
                   {m.title}
                 </h3>
                 <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-                  <span>r/{m.subreddit}</span>
+                  <span>@{m.subreddit}</span>
+                  <span className="inline-flex items-center gap-1.5 text-primary/80"><MessageCircle className="h-3 w-3" /><Heart className="h-3 w-3" /><Repeat2 className="h-3 w-3" /><Bookmark className="h-3 w-3" /></span>
                   {mine ? (
                     <span className="inline-flex items-center gap-1 font-medium text-primary">
                       <Timer className="h-3 w-3" />
@@ -334,7 +335,7 @@ export function MissionBrowser({
 
               <div className="space-y-5 text-sm">
                 <div className="flex flex-wrap gap-2">
-                  <Badge variant="secondary">r/{selected.subreddit}</Badge>
+                  <Badge variant="secondary">@{selected.subreddit}</Badge>
                   <Badge>${formatAmount(selected.payout)}</Badge>
                   {held ? (
                     <Badge variant="outline" className="border-primary/60 text-primary">
@@ -345,17 +346,10 @@ export function MissionBrowser({
 
                 {held && brief.data ? (
                   <div className="space-y-5">
-                    <Field label={type === "post" ? "Reddit community" : "Reddit post to comment on"}>
-                      <LinkOut
-                        href={
-                          type === "post"
-                            ? brief.data.community_url || `https://reddit.com/r/${selected.subreddit}`
-                            : brief.data.target_post_url ||
-                              brief.data.community_url ||
-                              `https://reddit.com/r/${selected.subreddit}`
-                        }
-                      />
+                    <Field label="X post to engage with">
+                      <LinkOut href={brief.data.target_post_url || `https://x.com/${selected.subreddit}`} />
                     </Field>
+                    <PackChecklist />
                     {type === "post" ? (
                       <>
                         <Field label="Exact title to use">
@@ -369,7 +363,7 @@ export function MissionBrowser({
                         ) : null}
                       </>
                     ) : (
-                      <Field label="Exact comment to publish">
+                      <Field label="Exact reply to post">
                         <pre className="whitespace-pre-wrap font-sans">{brief.data.comment_text}</pre>
                       </Field>
                     )}
@@ -381,7 +375,7 @@ export function MissionBrowser({
                   </div>
                 ) : held && brief.isLoading ? (
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <Loader2 className="h-4 w-4 animate-spin" /> Unlocking the Reddit link…
+                    <Loader2 className="h-4 w-4 animate-spin" /> Unlocking the X post…
                   </div>
                 ) : held && brief.isError ? (
                   <p className="rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-xs text-destructive">
@@ -393,12 +387,12 @@ export function MissionBrowser({
                       type={type}
                       message={
                         canSubmit
-                          ? "Take the mission to unlock the Reddit link"
+                          ? "Take the mission to unlock the X post"
                           : "Sign in with a verified account to see the link"
                       }
                     />
                     {canSubmit && type === "comment" && selected.comment_text ? (
-                      <Field label="Exact comment to publish">
+                      <Field label="Exact reply to post">
                         <pre className="whitespace-pre-wrap font-sans">{selected.comment_text}</pre>
                       </Field>
                     ) : null}
@@ -420,11 +414,10 @@ export function MissionBrowser({
                 <div className="flex gap-3 rounded-lg border border-destructive/40 bg-destructive/10 p-3">
                   <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
                   <div className="text-xs leading-relaxed">
-                    <p className="font-semibold text-destructive">Do not copy-paste — write by hand</p>
+                    <p className="font-semibold text-destructive">Type your reply by hand</p>
                     <p className="mt-1 text-muted-foreground">
-                      Reddit's algorithms detect copied content. Type the title, body, or comment
-                      manually instead of pasting it. Your submission will be rejected if it looks
-                      copy-pasted.
+                      X flags identical pasted replies. Type the reply manually instead of pasting
+                      it. Your submission will be rejected if it looks copy-pasted.
                     </p>
                   </div>
                 </div>
@@ -434,8 +427,8 @@ export function MissionBrowser({
                   <div className="text-xs leading-relaxed">
                     <p className="font-semibold text-warning">Follow the instructions exactly</p>
                     <p className="mt-1 text-muted-foreground">
-                      Do not change anything in the title, body, comment, flair or instructions. Any
-                      modification means your submission will not be accepted and will not be paid.
+                      Reply, like, repost and bookmark the exact post. A missing action or a modified
+                      reply means your submission will not be accepted and will not be paid.
                     </p>
                   </div>
                 </div>
@@ -445,16 +438,16 @@ export function MissionBrowser({
                   <div className="text-xs leading-relaxed">
                     <p className="font-semibold text-destructive">Stay natural between tasks</p>
                     <p className="mt-1 text-muted-foreground">
-                      Between each paid task, leave normal comments and stay active on Reddit like
-                      any regular user. If you only post sponsored content, your account may be
-                      flagged, banned or deleted.
+                      Between each paid task, keep posting and interacting on X like any regular
+                      user. Accounts that only engage with sponsored launches may be limited or
+                      suspended.
                     </p>
                   </div>
                 </div>
 
                 <p className="rounded-lg border border-border bg-background/60 p-3 text-xs text-muted-foreground">
-                  The publication must stay online for at least 3 hours and must not be deleted after
-                  payment.
+                  Your reply, like, repost and bookmark must stay in place for at least 3 hours and must
+                  not be removed after payment.
                 </p>
 
                 {canSubmit ? (
@@ -467,8 +460,8 @@ export function MissionBrowser({
                             Mission reserved for you — {formatLeft(msLeft)} left
                           </p>
                           <p className="mt-1 text-muted-foreground">
-                            Nobody else can see or take it during this time. Publish on Reddit, then
-                            paste your link below. If the timer runs out without a link, the mission
+                            Nobody else can see or take it during this time. Complete the 4 actions on X,
+                            then paste your reply link below. If the timer runs out without a link, the mission
                             is automatically put back online for everyone.
                           </p>
                         </div>
@@ -476,12 +469,12 @@ export function MissionBrowser({
 
                       <form onSubmit={onSubmit} className="space-y-3">
                         <label className="block text-xs font-medium text-muted-foreground">
-                          {type === "post" ? "Link to your Reddit post" : "Link to your comment"}
+                          Link to your reply on X
                         </label>
                         <Input
                           value={url}
                           onChange={(e) => setUrl(e.target.value)}
-                          placeholder="https://reddit.com/r/…"
+                          placeholder="https://x.com/yourhandle/status/…"
                           required
                           maxLength={500}
                         />
@@ -512,7 +505,7 @@ export function MissionBrowser({
                         <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
                         Daily limit reached — {DAILY_LIMITS[type]} {type} mission
                         {DAILY_LIMITS[type] > 1 ? "s" : ""} per day and per account. This protects
-                        your Reddit account. Come back tomorrow to take a new one.
+                        your X account. Come back tomorrow to take a new one.
                       </p>
                       <Button className="w-full" disabled>
                         <Lock className="mr-2 h-4 w-4" />
@@ -523,10 +516,10 @@ export function MissionBrowser({
                     <div className="space-y-3">
                       <p className="flex items-start gap-2 text-xs text-muted-foreground">
                         <Clock className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-                        Take the mission first: it unlocks the Reddit link and reserves the mission
-                        for you for 10 minutes. It disappears for everyone else, and comes back
-                        online automatically if you don't submit a link in time. Don't comment
-                        before taking it — that comment won't be paid.
+                        Take the mission first: it unlocks the X post and reserves it for you for 10
+                        minutes. It disappears for everyone else, and comes back online
+                        automatically if you don't submit a link in time. Actions done before
+                        taking it won't be paid.
                       </p>
                       <Button className="w-full" onClick={onReserve} disabled={reserve.isPending}>
                         {reserve.isPending ? (
@@ -585,15 +578,15 @@ function LinkOut({ href }: { href: string }) {
 }
 
 /**
- * Blurred stand-in for the Reddit link and the brief. It only contains fake
+ * Blurred stand-in for the X post link and the brief. It only contains fake
  * text: the real link is never loaded before the member reserves the mission.
  */
 function LockedBrief({ type, message }: { type: "post" | "comment"; message: string }) {
   return (
     <div className="relative">
       <div aria-hidden className="pointer-events-none select-none space-y-5 blur-[6px]">
-        <Field label={type === "post" ? "Reddit community" : "Reddit post to comment on"}>
-          <span className="text-primary">https://www.reddit.com/r/xxxxxxxx/comments/xxxxxx/xxxxxxxxxxxx</span>
+        <Field label={type === "post" ? "X post to engage with" : "X post to engage with"}>
+          <span className="text-primary">https://x.com/xxxxxxxx/status/xxxxxxxxxxxxxxxxxx</span>
         </Field>
       </div>
       <div className="absolute inset-0 flex items-center justify-center p-4">
@@ -601,6 +594,27 @@ function LockedBrief({ type, message }: { type: "post" | "comment"; message: str
           <Lock className="h-3.5 w-3.5 shrink-0 text-primary" /> {message}
         </span>
       </div>
+    </div>
+  );
+}
+
+function PackChecklist() {
+  const items = [
+    { icon: MessageCircle, label: "Reply with the exact text" },
+    { icon: Heart, label: "Like the post" },
+    { icon: Repeat2, label: "Repost it" },
+    { icon: Bookmark, label: "Bookmark it" },
+  ];
+  return (
+    <div>
+      <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Your task pack</div>
+      <ul className="mt-1.5 grid grid-cols-2 gap-2">
+        {items.map((it) => (
+          <li key={it.label} className="flex items-center gap-2 rounded-lg border border-primary/25 bg-primary/5 px-3 py-2.5 text-xs">
+            <it.icon className="h-4 w-4 shrink-0 text-primary" /> {it.label}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

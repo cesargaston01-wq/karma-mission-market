@@ -13,9 +13,9 @@ import { useIsAdmin, useProfile } from "@/lib/data";
 export const Route = createFileRoute("/_authenticated/referrals")({
   head: () => ({
     meta: [
-      { title: "Referrals — TaskReddit" },
-      { name: "description", content: "Invite friends to TaskReddit and earn USDC for every validated member and mission." },
-      { property: "og:title", content: "Referrals — TaskReddit" },
+      { title: "Referrals — Aurum" },
+      { name: "description", content: "Invite friends to Aurum and earn USDC for every validated member and mission." },
+      { property: "og:title", content: "Referrals — Aurum" },
       { property: "og:description", content: "Earn $1 per validated invite and $0.50 per mission they complete." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -24,7 +24,7 @@ export const Route = createFileRoute("/_authenticated/referrals")({
   component: ReferralsPage,
 });
 
-const SITE = "https://reddit-task-money.lovable.app";
+const SITE = typeof window !== "undefined" ? window.location.origin : "";
 
 type Referral = { username: string; status: string; joined_at: string; approved_missions: number; earned: number };
 type AdminRow = { referrer_id: string; username: string; wallet: string; invited: number; validated: number; approved_missions: number; earned: number };

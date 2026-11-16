@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
 import { blogArticles } from "@/lib/blog";
 
-const BASE_URL = "https://reddit-task-money.lovable.app";
+import { BLOG_SITE_URL as BASE_URL } from "@/lib/blog";
 
 interface SitemapEntry {
   path: string;

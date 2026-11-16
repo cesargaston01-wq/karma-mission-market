@@ -16,14 +16,14 @@ const stats = [
   {
     icon: Users,
     value: "500+",
-    label: "Reddit accounts earning daily",
+    label: "X accounts earning daily",
     description: "Active users monetizing their accounts with comments.",
   },
   {
     icon: TrendingUp,
-    value: "$3.50",
+    value: "$5",
     label: "Fixed payout per mission",
-    description: "Transparent pricing: $3.50 per approved comment.",
+    description: "Transparent pricing: $5 per approved task pack.",
   },
 ];
 

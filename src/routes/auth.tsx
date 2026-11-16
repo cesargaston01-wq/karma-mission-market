@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { PasswordInput } from "@/components/password-input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useSession } from "@/lib/data";
+import { BrandMark } from "@/components/brand";
 
 // The editor preview can't send Resend emails itself, so it asks the live site to do it.
 const LIVE_SITE = "https://reddit-task-money.lovable.app";
@@ -37,18 +38,16 @@ import {
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Sign in — TaskReddit" },
+      { title: "Sign in — Aurum" },
       {
         name: "description",
-        content: "Sign in or create your Reddit worker account to access paid missions.",
+        content: "Apply with your X account or sign in to access paid launch missions.",
       },
-      { property: "og:title", content: "Sign in — TaskReddit" },
-      { property: "og:description", content: "Access your Reddit missions dashboard." },
+      { property: "og:title", content: "Sign in — Aurum" },
+      { property: "og:description", content: "Access your Aurum missions dashboard." },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://reddit-task-money.lovable.app/auth" },
       { name: "twitter:card", content: "summary" },
     ],
-    links: [{ rel: "canonical", href: "https://reddit-task-money.lovable.app/auth" }],
   }),
 
   component: AuthPage,
@@ -62,22 +61,19 @@ const signupSchema = z.object({
     .trim()
     .max(255)
     .regex(
-      /^https?:\/\/(www\.)?reddit\.com\/user\/[A-Za-z0-9_-]+\/?$/,
-      "e.g. https://reddit.com/user/username",
+      /^https:\/\/x\.com\/[A-Za-z0-9_]{1,15}$/,
+      "e.g. https://x.com/username or @username",
     ),
 });
 
-function normalizeRedditUrl(raw: string): string {
-  const trimmed = raw.trim();
+function normalizeXUrl(raw: string): string {
+  const trimmed = raw.trim().replace(/\/+$/, "");
   if (!trimmed) return trimmed;
-
-  if (/^https?:\/\//i.test(trimmed)) {
-    return trimmed.replace(/\/$/, "");
-  }
-
-  const username = trimmed.startsWith("@") ? trimmed.slice(1).trim() : trimmed;
-  if (!username) return trimmed;
-  return `https://reddit.com/user/${username}`;
+  const fromUrl = trimmed.match(/^https?:\/\/(?:www\.|mobile\.)?(?:x|twitter)\.com\/([A-Za-z0-9_]{1,15})(?:[/?#].*)?$/i);
+  if (fromUrl) return `https://x.com/${fromUrl[1]}`;
+  const handle = trimmed.replace(/^@/, "").trim();
+  if (/^[A-Za-z0-9_]{1,15}$/.test(handle)) return `https://x.com/${handle}`;
+  return trimmed;
 }
 
 function AuthPage() {
@@ -133,15 +129,15 @@ function AuthPage() {
   async function handleSignup(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
-    const redditUrl = normalizeRedditUrl(String(fd.get("reddit_profile_url") ?? ""));
+    const xUrl = normalizeXUrl(String(fd.get("reddit_profile_url") ?? ""));
     const parsed = signupSchema.safeParse({
       email: fd.get("email"),
       password: fd.get("password"),
-      reddit_profile_url: redditUrl,
+      reddit_profile_url: xUrl,
     });
     if (!parsed.success) return toast.error(parsed.error.issues[0].message);
 
-    const redditUsername =
+    const xUsername =
       parsed.data.reddit_profile_url.replace(/\/+$/, "").split("/").pop() ??
       parsed.data.email.split("@")[0];
 
@@ -151,7 +147,7 @@ function AuthPage() {
         data: {
           email: parsed.data.email,
           password: parsed.data.password,
-          full_name: redditUsername,
+          full_name: xUsername,
           reddit_profile_url: parsed.data.reddit_profile_url,
           referral_code: localStorage.getItem("taskreddit_ref") ?? "",
         },
@@ -161,7 +157,7 @@ function AuthPage() {
           action: "signup",
           email: parsed.data.email,
           password: parsed.data.password,
-          full_name: redditUsername,
+          full_name: xUsername,
           reddit_profile_url: parsed.data.reddit_profile_url,
           referral_code: localStorage.getItem("taskreddit_ref") ?? "",
         });
@@ -177,7 +173,7 @@ function AuthPage() {
     } finally {
       setLoading(false);
     }
-    toast.success("Account created. Your Reddit profile is being reviewed.");
+    toast.success("Account created. Your X profile is being reviewed.");
     navigate({ to: "/opportunities/comments" });
   }
 
@@ -227,8 +223,8 @@ function AuthPage() {
   if (showConfirmMessage) {
     return (
       <div className="hero-surface flex min-h-screen flex-col items-center justify-center px-5 py-12">
-        <Link to="/" className="mb-8 font-display text-lg font-bold">
-          Task<span className="text-primary">Reddit</span>
+        <Link to="/" className="mb-10">
+          <BrandMark />
         </Link>
         <div className="panel elevated w-full max-w-md p-6 text-center">
           <h1 className="mb-4 text-xl font-bold">Confirm your email</h1>
@@ -262,11 +258,12 @@ function AuthPage() {
 
   return (
     <div className="hero-surface flex min-h-screen flex-col items-center justify-center px-5 py-12">
-      <Link to="/" className="mb-8 font-display text-lg font-bold">
-        Task<span className="text-primary">Reddit</span>
-      </Link>
+      <Link to="/" className="mb-10">
+          <BrandMark />
+        </Link>
 
-      <h1 className="mb-6 text-center text-2xl font-bold">Access your TaskReddit account</h1>
+      <h1 className="mb-2 text-center text-4xl md:text-5xl">Join the <em className="text-gold">circle</em></h1>
+      <p className="mb-8 text-center text-sm text-muted-foreground">Paid task packs for verified X users.</p>
 
       <div className="panel elevated w-full max-w-md p-6">
         <Tabs defaultValue="signup">
@@ -287,17 +284,17 @@ function AuthPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="s-reddit">Link to your Reddit profile or @username</Label>
+                <Label htmlFor="s-reddit">Your X profile link or @handle</Label>
                 <Input
                   id="s-reddit"
                   name="reddit_profile_url"
-                  placeholder="https://reddit.com/user/username or @username"
+                  placeholder="@yourhandle"
                   required
                   maxLength={255}
                 />
               </div>
-              <Button type="submit" className="w-full" disabled={loading}>
-                Create my account
+              <Button type="submit" className="bg-gold w-full text-primary-foreground hover:opacity-90" disabled={loading}>
+                Apply with my X account
               </Button>
               <p className="text-center text-xs text-muted-foreground">
                 Your account stays pending until it's manually reviewed.

@@ -1,6 +1,6 @@
 export const SITE_URL = "https://reddit-task-money.lovable.app";
-export const FROM_EMAIL = "TaskReddit <contact@taskreddit.com>";
-export const AUTH_FROM_EMAIL = "TaskReddit <noreply@taskreddit.com>";
+export const FROM_EMAIL = "Aurum <contact@taskreddit.com>";
+export const AUTH_FROM_EMAIL = "Aurum <noreply@taskreddit.com>";
 export const REPLY_TO = "contact@taskreddit.com";
 // Addresses removed from all mission/marketing mailings (auth emails still go out).
 export const UNSUBSCRIBED = new Set<string>(["valentinjardinieralmodovar@gmail.com"]);
@@ -27,7 +27,7 @@ export function emailLayout(title: string, content: string, footerNote = "") {
 <div style="margin-bottom:24px;"><span style="font-size:20px;font-weight:700;color:#0F172A;">Task<span style="color:#FF4500;">Reddit</span></span></div>
 ${content}
 <p style="color:#94a3b8;font-size:12px;margin-top:32px;border-top:1px solid #e2e8f0;padding-top:16px;">
-TaskReddit — paid Reddit missions for verified creators.<br>
+Aurum — paid Reddit missions for verified creators.<br>
 Questions? Reply to this email or write to <a href="mailto:${REPLY_TO}" style="color:#FF4500;">${REPLY_TO}</a>.${footerNote}
 </p>
 </td></tr></table></td></tr></table></body></html>`;

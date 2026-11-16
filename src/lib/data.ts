@@ -7,8 +7,11 @@ export type Profile = Tables<"profiles">;
 export type Mission = Tables<"missions">;
 export type Submission = Tables<"submissions">;
 
-export const PAYOUT_POST = 5;
-export const PAYOUT_COMMENT = 3;
+/** Fixed reward for one task pack (reply + like + repost + bookmark on one X post). */
+export const PAYOUT_PACK = 5;
+
+/** Accepts x.com / twitter.com status links. */
+export const X_STATUS_URL = /^https?:\/\/(www\.|mobile\.)?(x|twitter)\.com\/[A-Za-z0-9_]{1,15}\/status\/\d+/i;
 
 /**
  * Resolves the signed-in user from the persisted session first.
@@ -68,7 +71,7 @@ export function useIsAdmin() {
 }
 
 /**
- * Columns members may see before reserving. The Reddit link and the comment
+ * Columns members may see before reserving. The X post link and the comment
  * are only returned by `get_mission_brief` once the member holds the mission.
  */
 const MISSION_LIST_COLUMNS =
@@ -252,8 +255,8 @@ export function useSubmitMission() {
   return useMutation({
     mutationFn: async ({ mission, url }: { mission: Mission; url: string }) => {
       const submittedUrl = url.trim();
-      if (!/^https?:\/\/(www\.|old\.|new\.)?reddit\.com\/.+/i.test(submittedUrl)) {
-        throw new Error("Enter a valid Reddit link.");
+      if (!X_STATUS_URL.test(submittedUrl)) {
+        throw new Error("Enter the link to your reply on X (https://x.com/…/status/…).");
       }
 
       const user = await getCurrentUser();
@@ -313,7 +316,7 @@ export function useReserveMission() {
   });
 }
 
-/** Reddit link + comment for a mission the member currently holds. */
+/** X post link + comment for a mission the member currently holds. */
 export function useMissionBrief(missionId: string | null, enabled: boolean) {
   return useQuery({
     queryKey: ["mission-brief", missionId],

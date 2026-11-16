@@ -6,14 +6,14 @@ import { Badge } from "@/components/ui/badge";
  * Purely illustrative: it never reads the database.
  */
 const PAID_HISTORY = [
-  { subreddit: "personalfinance", type: "post", amount: 5, when: "2 hours ago" },
-  { subreddit: "Entrepreneur", type: "comment", amount: 3, when: "5 hours ago" },
-  { subreddit: "SaaS", type: "comment", amount: 3, when: "8 hours ago" },
-  { subreddit: "fitness", type: "post", amount: 5, when: "Yesterday" },
-  { subreddit: "productivity", type: "comment", amount: 3, when: "Yesterday" },
-  { subreddit: "startups", type: "post", amount: 5, when: "2 days ago" },
-  { subreddit: "webdev", type: "comment", amount: 3, when: "2 days ago" },
-  { subreddit: "marketing", type: "post", amount: 5, when: "3 days ago" },
+  { subreddit: "lumenapp", amount: 5, when: "2 hours ago" },
+  { subreddit: "orbitai", amount: 5, when: "5 hours ago" },
+  { subreddit: "shipfast_hq", amount: 5, when: "8 hours ago" },
+  { subreddit: "nordwallet", amount: 5, when: "Yesterday" },
+  { subreddit: "pixelforge", amount: 5, when: "Yesterday" },
+  { subreddit: "tallyhq", amount: 5, when: "2 days ago" },
+  { subreddit: "relaydev", amount: 5, when: "2 days ago" },
+  { subreddit: "atlas_os", amount: 5, when: "3 days ago" },
 ];
 
 export function CommunityHistory({ className = "" }: { className?: string }) {
@@ -34,11 +34,10 @@ export function CommunityHistory({ className = "" }: { className?: string }) {
           >
             <div className="min-w-0">
               <h3 className="truncate text-sm font-semibold select-none blur-[5px]">
-                {item.type === "post" ? "Sponsored post" : "Sponsored comment"} published in r/
-                {item.subreddit}
+Launch task pack completed for @{item.subreddit}
               </h3>
               <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-                <span>r/{item.subreddit}</span>
+                <span>@{item.subreddit}</span>
                 <span>{item.when}</span>
               </div>
             </div>

@@ -50,10 +50,10 @@ const LIVE_SITE = "https://reddit-task-money.lovable.app";
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
     meta: [
-      { title: "Administration — TaskReddit" },
-      { name: "description", content: "Manage missions, submissions and Reddit accounts." },
-      { property: "og:title", content: "Administration — TaskReddit" },
-      { property: "og:description", content: "TaskReddit mission and submission administration." },
+      { title: "Administration — Aurum" },
+      { name: "description", content: "Manage missions, submissions and X accounts." },
+      { property: "og:title", content: "Administration — Aurum" },
+      { property: "og:description", content: "Aurum mission and submission administration." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -91,9 +91,10 @@ function talentirStatusLabel(status: string | null | undefined) {
   }
 }
 
-function extractRedditSubreddit(value: string) {
-  const match = value.match(/(?:^|\/)r\/([^/?#]+)/i);
-  return match?.[1]?.trim().replace(/^r\//i, "") ?? "";
+/** Returns the author handle of an x.com / twitter.com status link. */
+function extractXHandle(value: string) {
+  const match = value.match(/^https?:\/\/(?:www\.|mobile\.)?(?:x|twitter)\.com\/([A-Za-z0-9_]{1,15})\/status\/\d+/i);
+  return match?.[1] ?? "";
 }
 
 function AdminPage() {
@@ -277,7 +278,7 @@ function AdminPage() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `taskreddit-accounts-${new Date().toISOString().slice(0, 10)}.csv`;
+    link.download = `aurum-accounts-${new Date().toISOString().slice(0, 10)}.csv`;
     link.click();
     URL.revokeObjectURL(url);
     toast.success(`${rows.length} account${rows.length > 1 ? "s" : ""} exported`);
@@ -312,25 +313,23 @@ function AdminPage() {
 
     const communityUrl = (draft.community_url ?? "").trim();
     const targetPostUrl = (draft.target_post_url ?? "").trim();
-    const subreddit = extractRedditSubreddit(draft.type === "post" ? communityUrl : targetPostUrl);
+    const subreddit = extractXHandle(targetPostUrl);
     const payload = {
-      type: draft.type,
+      type: "comment" as const,
       title: (draft.title ?? "").trim(),
       subreddit,
-      community_url: draft.type === "post" ? communityUrl : "",
-      payout: Number(draft.payout ?? (draft.type === "post" ? 5 : 3.5)),
+      community_url: communityUrl,
+      payout: Number(draft.payout ?? 5),
       post_title: draft.post_title ?? null,
       post_body: draft.post_body ?? null,
       flair: draft.flair ?? null,
-      target_post_url: draft.type === "comment" ? targetPostUrl : null,
+      target_post_url: targetPostUrl,
       comment_text: draft.comment_text ?? null,
       is_active: draft.is_active ?? true,
     };
     if (!payload.title || !payload.subreddit) {
       return toast.error(
-        draft.type === "post"
-          ? "Enter a valid Reddit community link."
-          : "Enter a valid Reddit post link.",
+"Enter a mission name and a valid X post link (https://x.com/…/status/…).",
       );
     }
 
@@ -494,7 +493,7 @@ function AdminPage() {
 
         <TabsContent value="missions" className="mt-6 space-y-4">
           <div className="flex flex-wrap gap-2">
-            <Button size="sm" onClick={() => setDraft({ type: "comment", payout: 3.5 })}>
+            <Button size="sm" onClick={() => setDraft({ type: "comment", payout: 5 })}>
               <Plus className="mr-1 h-4 w-4" /> Comment mission
             </Button>
             <Button size="sm" variant={missionFilter === "live" ? "default" : "outline"} onClick={() => setMissionFilter("live")}>
@@ -512,7 +511,7 @@ function AdminPage() {
                   <div className="min-w-0">
                     <div className="truncate font-medium">{m.title}</div>
                     <div className="text-xs text-muted-foreground">
-                      {m.type === "post" ? "Post" : "Comment"} · r/{m.subreddit} · $
+                      Task pack · @{m.subreddit} · $
                       {formatAmount(m.payout)} {m.is_active ? "" : "· inactive"} {m.is_locked ? "· locked" : ""}
                     </div>
                   </div>
@@ -545,7 +544,7 @@ function AdminPage() {
           <div className="panel flex flex-col gap-3 p-3 lg:flex-row lg:items-center lg:justify-between">
             <div>
               <p className="text-sm font-semibold text-foreground">Submission queue</p>
-              <p className="text-xs text-muted-foreground">Review links submitted by your Reddit workers.</p>
+              <p className="text-xs text-muted-foreground">Review reply links submitted by your X members.</p>
             </div>
             <div className="flex gap-1 overflow-x-auto pb-0.5">
               {(["all", "comment"] as const).map((filter) => (
@@ -636,7 +635,7 @@ function AdminPage() {
             <Input
               value={userSearch}
               onChange={(e) => setUserSearch(e.target.value)}
-              placeholder="Search by name, email or Reddit profile"
+              placeholder="Search by name, email or X profile"
               className="max-w-none sm:max-w-xs"
             />
             <div className="flex gap-1 overflow-x-auto pb-0.5">
@@ -969,38 +968,21 @@ function AdminPage() {
         <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>
-              {draft?.id ? "Edit mission" : draft?.type === "post" ? "New post mission" : "New comment mission"}
+              {draft?.id ? "Edit task pack" : "New task pack"}
             </DialogTitle>
           </DialogHeader>
           {draft ? (
             <div className="space-y-4">
               <FieldInput label="Mission name" value={draft.title ?? ""} onChange={(v) => setDraft({ ...draft, title: v })} />
-              {draft.type === "post" ? (
-                <FieldInput
-                  label="Community link"
-                  value={draft.community_url ?? ""}
-                  onChange={(v) => setDraft({ ...draft, community_url: v })}
-                  placeholder="https://www.reddit.com/r/..."
-                />
-              ) : (
-                <FieldInput
-                  label="Reddit post link"
-                  value={draft.target_post_url ?? ""}
-                  onChange={(v) => setDraft({ ...draft, target_post_url: v })}
-                  placeholder="https://www.reddit.com/r/.../comments/..."
-                />
-              )}
+              <FieldInput
+                label="X post link"
+                value={draft.target_post_url ?? ""}
+                onChange={(v) => setDraft({ ...draft, target_post_url: v })}
+                placeholder="https://x.com/handle/status/..."
+              />
               <FieldInput label="Payout ($)" type="number" value={String(draft.payout ?? "")} onChange={(v) => setDraft({ ...draft, payout: Number(v) })} />
-
-              {draft.type === "post" ? (
-                <>
-                  <FieldInput label="Exact post title" value={draft.post_title ?? ""} onChange={(v) => setDraft({ ...draft, post_title: v })} />
-                  <FieldArea label="Full body" value={draft.post_body ?? ""} onChange={(v) => setDraft({ ...draft, post_body: v })} />
-                  <FieldInput label="Flair" value={draft.flair ?? ""} onChange={(v) => setDraft({ ...draft, flair: v })} />
-                </>
-              ) : (
-                <FieldArea label="Exact comment" value={draft.comment_text ?? ""} onChange={(v) => setDraft({ ...draft, comment_text: v })} />
-              )}
+              <FieldArea label="Exact reply text" value={draft.comment_text ?? ""} onChange={(v) => setDraft({ ...draft, comment_text: v })} />
+              <p className="text-xs text-muted-foreground">Members will reply with this text, then like, repost and bookmark the post.</p>
               <Button className="w-full" onClick={saveMission}>
                 Save
               </Button>

@@ -82,19 +82,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "TaskReddit — Monetize your Reddit account" },
+      { title: "Aurum — Paid tasks for X users" },
       {
         name: "description",
-        content: "Earn money with your Reddit account: publish posts and comments in relevant communities. get paid for each Task",
+        content: "Get paid $5 to support X launches: comment, like, repost and bookmark curated posts with your X account.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { property: "og:title", content: "TaskReddit — Monetize your Reddit account" },
-      { name: "twitter:title", content: "TaskReddit — Monetize your Reddit account" },
-      { property: "og:description", content: "Earn money with your Reddit account: publish posts and comments in relevant communities. get paid for each Task" },
-      { name: "twitter:description", content: "Earn money with your Reddit account: publish posts and comments in relevant communities. get paid for each Task" },
-      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/1f2098f6-0ef9-4684-9a98-d2929c31801d" },
-      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/1f2098f6-0ef9-4684-9a98-d2929c31801d" },
+      { property: "og:title", content: "Aurum — Paid tasks for X users" },
+      { name: "twitter:title", content: "Aurum — Paid tasks for X users" },
+      { property: "og:description", content: "Get paid $5 to support X launches: comment, like, repost and bookmark curated posts with your X account." },
+      { name: "twitter:description", content: "Get paid $5 to support X launches: comment, like, repost and bookmark curated posts with your X account." },
     ],
     links: [
       {
@@ -106,7 +104,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Manrope:wght@400;500;600;700&display=swap",
       },
     ],
     scripts: [
@@ -117,17 +115,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "@graph": [
             {
               "@type": "Organization",
-              "@id": "https://reddit-task-money.lovable.app/#organization",
-              name: "TaskReddit",
-              url: "https://reddit-task-money.lovable.app/",
+              "@id": "https://aurum-x.lovable.app/#organization",
+              name: "Aurum",
+              url: "https://aurum-x.lovable.app/",
               
             },
             {
               "@type": "WebSite",
-              "@id": "https://reddit-task-money.lovable.app/#website",
-              name: "TaskReddit",
-              url: "https://reddit-task-money.lovable.app/",
-              publisher: { "@id": "https://reddit-task-money.lovable.app/#organization" },
+              "@id": "https://aurum-x.lovable.app/#website",
+              name: "Aurum",
+              url: "https://aurum-x.lovable.app/",
+              publisher: { "@id": "https://aurum-x.lovable.app/#organization" },
             },
           ],
         }),

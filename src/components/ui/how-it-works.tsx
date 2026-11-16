@@ -35,19 +35,19 @@ const Card = ({
   colors: customColors,
 }: CardProps) => {
   const defaultBgColors = {
-    orange: "bg-orange-500/10",
-    blue: "bg-blue-500/10",
-    purple: "bg-purple-500/10",
+    orange: "bg-primary/10",
+    blue: "bg-primary/15",
+    purple: "bg-primary/20",
   };
   const defaultTextColors = {
-    orange: "text-orange-400",
-    blue: "text-blue-400",
-    purple: "text-purple-400",
+    orange: "text-primary",
+    blue: "text-primary",
+    purple: "text-primary",
   };
   const defaultBorderColors = {
-    orange: "border-orange-500/20",
-    blue: "border-blue-500/20",
-    purple: "border-purple-500/20",
+    orange: "border-primary/20",
+    blue: "border-primary/25",
+    purple: "border-primary/30",
   };
 
   const bgColor = customColors?.bg || defaultBgColors[colorTheme];
@@ -120,12 +120,12 @@ export default function HowItWorks({ features, className, stepPositions }: HowIt
   const defaultFeatures: Step[] = [
     {
       title: "Create Account",
-      description: "Sign up in minutes and connect your Reddit profile.",
+      description: "Sign up in minutes and connect your X profile.",
       colorTheme: "orange",
     },
     {
       title: "Verify Identity",
-      description: "We manually review your account age, karma and history.",
+      description: "We manually review your account age, followers and history.",
       colorTheme: "blue",
     },
     {

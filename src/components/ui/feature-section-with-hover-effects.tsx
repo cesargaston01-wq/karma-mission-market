@@ -18,31 +18,31 @@ interface Feature {
 
 const FEATURES: Feature[] = [
   {
-    value: "300+",
-    label: "Missions published monthly",
+    value: "120+",
+    label: "X launches supported monthly",
     description:
-      "New opportunities are added every week across targeted communities.",
+      "New launch posts from founders and product teams every week.",
     icon: <IconRocket className="h-6 w-6" />,
   },
   {
     value: "$25K+",
     label: "Already paid out",
     description:
-      "Approved contributions are paid through a Talentir email link. Choose from available crypto, PayPal or bank transfer options.",
+      "Approved task packs are paid through a Talentir email link. Choose from available crypto, PayPal or bank transfer options.",
     icon: <IconWallet className="h-6 w-6" />,
   },
   {
-    value: "500+",
-    label: "Reddit accounts earning daily",
+    value: "800+",
+    label: "Verified X members",
     description:
-      "Active users monetizing their accounts with comments.",
+      "Real accounts turning their timeline into steady side income.",
     icon: <IconUsers className="h-6 w-6" />,
   },
   {
-    value: "$3.50",
-    label: "Fixed payout per mission",
+    value: "$5",
+    label: "Per task pack",
     description:
-      "Transparent pricing: $3.50 per approved comment.",
+      "Reply, like, repost and bookmark one post — $5 once approved.",
     icon: <IconCoin className="h-6 w-6" />,
   },
 ];
@@ -97,7 +97,7 @@ function Feature({
     <div
       className={cn(
         "group relative flex flex-col overflow-hidden rounded-2xl border border-border/60 bg-surface/40 p-6 transition-all duration-300",
-        isHovered && "scale-[1.02] border-primary/40 bg-surface/80 shadow-[0_0_40px_-12px_hsl(var(--primary)/0.3)]",
+        isHovered && "scale-[1.02] border-primary/40 bg-surface/80 shadow-[var(--shadow-glow)]",
         isDimmed && "scale-[0.98] opacity-60",
       )}
       onMouseEnter={() => setHoveredIndex(index)}

@@ -17,14 +17,14 @@ export function adminAvailable() {
 async function sendAuthMail(to: string, kind: "signup" | "magiclink" | "recovery", tokenHash: string) {
   const url = `${SITE_URL}/auth/confirm?token_hash=${encodeURIComponent(tokenHash)}&type=${kind}&next=${encodeURIComponent("/opportunities/comments")}`;
   const isReset = kind === "recovery";
-  const subject = isReset ? "Reset your TaskReddit password" : "Confirm your TaskReddit account";
+  const subject = isReset ? "Reset your Aurum password" : "Confirm your Aurum account";
   const content = isReset
     ? `<h1 style="color:#0F172A;font-size:24px;margin:0 0 16px;">Reset your password</h1>
-       <p style="color:#334155;font-size:16px;line-height:1.5;margin:0 0 24px;">Click below to choose a new password for your TaskReddit account.</p>
+       <p style="color:#334155;font-size:16px;line-height:1.5;margin:0 0 24px;">Click below to choose a new password for your Aurum account.</p>
        ${button(url, "Reset password")}
        <p style="color:#64748B;font-size:14px;margin-top:24px;">If you didn't request this, you can ignore this email.</p>`
-    : `<h1 style="color:#0F172A;font-size:24px;margin:0 0 16px;">Welcome to TaskReddit</h1>
-       <p style="color:#334155;font-size:16px;line-height:1.5;margin:0 0 24px;">Confirm your email to start earning on Reddit missions.</p>
+    : `<h1 style="color:#0F172A;font-size:24px;margin:0 0 16px;">Welcome to Aurum</h1>
+       <p style="color:#334155;font-size:16px;line-height:1.5;margin:0 0 24px;">Confirm your email to start earning with paid X missions.</p>
        ${button(url, "Confirm my email")}
        <p style="color:#64748B;font-size:14px;margin-top:24px;">If the button doesn't work, paste this link:<br>${url}</p>`;
   await resendRequest("/emails", {
@@ -41,9 +41,9 @@ export type AuthActionResult = { ok: true } | { ok: false; error: string };
 async function sendConfirmMail(to: string, userId: string) {
   const { createConfirmParams } = await import("./email-confirm-token.server");
   const url = `${SITE_URL}/api/public/confirm-email?${await createConfirmParams(userId)}`;
-  const subject = "Confirm your TaskReddit account";
-  const content = `<h1 style="color:#0F172A;font-size:24px;margin:0 0 16px;">Welcome to TaskReddit</h1>
-       <p style="color:#334155;font-size:16px;line-height:1.5;margin:0 0 24px;">Confirm your email to start earning on Reddit missions.</p>
+  const subject = "Confirm your Aurum account";
+  const content = `<h1 style="color:#0F172A;font-size:24px;margin:0 0 16px;">Welcome to Aurum</h1>
+       <p style="color:#334155;font-size:16px;line-height:1.5;margin:0 0 24px;">Confirm your email to start earning with paid X missions.</p>
        ${button(url, "Confirm my email")}
        <p style="color:#64748B;font-size:14px;margin-top:24px;">If the button doesn't work, paste this link:<br>${url}</p>`;
   await resendRequest("/emails", {
