@@ -3,20 +3,20 @@ import { cn } from "@/lib/utils";
 
 export const BRAND_NAME = "Aurum";
 
-/** Gold monogram + wordmark used across every page header. */
+/** Brand monogram + wordmark used across every page header. */
 export function BrandMark({ className, size = "md" }: { className?: string; size?: "sm" | "md" }) {
   return (
     <span className={cn("inline-flex items-center gap-2.5", className)}>
       <span
         aria-hidden
         className={cn(
-          "bg-gold relative inline-flex shrink-0 items-center justify-center rounded-lg font-display font-bold text-primary-foreground shadow-[var(--shadow-glow)]",
+          "bg-brand relative inline-flex shrink-0 items-center justify-center rounded-lg font-display font-bold text-primary-foreground shadow-[var(--shadow-glow)]",
           size === "sm" ? "h-6 w-6 text-sm" : "h-8 w-8 text-lg",
         )}
       >
         A
       </span>
-      <span className={cn("font-display font-semibold tracking-wide", size === "sm" ? "text-base" : "text-xl")}>
+      <span className={cn("font-display font-semibold tracking-tight", size === "sm" ? "text-base" : "text-xl")}>
         Aurum<span className="text-primary">.</span>
       </span>
     </span>

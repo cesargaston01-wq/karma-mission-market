@@ -262,7 +262,7 @@ function AuthPage() {
           <BrandMark />
         </Link>
 
-      <h1 className="mb-2 text-center text-4xl md:text-5xl">Join the <em className="text-gold">circle</em></h1>
+      <h1 className="mb-2 text-center text-4xl md:text-5xl">Join the <em className="text-brand not-italic">circle</em></h1>
       <p className="mb-8 text-center text-sm text-muted-foreground">Paid task packs for verified X users.</p>
 
       <div className="panel elevated w-full max-w-md p-6">
@@ -293,7 +293,7 @@ function AuthPage() {
                   maxLength={255}
                 />
               </div>
-              <Button type="submit" className="bg-gold w-full text-primary-foreground hover:opacity-90" disabled={loading}>
+              <Button type="submit" className="bg-brand w-full text-primary-foreground hover:opacity-90" disabled={loading}>
                 Apply with my X account
               </Button>
               <p className="text-center text-xs text-muted-foreground">

@@ -44,7 +44,7 @@ function DiscoverPage() {
             <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
               <Link to="/blog">Journal</Link>
             </Button>
-            <Button asChild size="sm" className="bg-gold px-4 text-primary-foreground hover:opacity-90">
+            <Button asChild size="sm" className="bg-brand px-4 text-primary-foreground hover:opacity-90">
               <Link to={user ? "/opportunities/comments" : "/auth"}>
                 <span className="sm:hidden">{user ? "Dashboard" : "Get started"}</span>
                 <span className="hidden sm:inline">{user ? "Go to dashboard" : "Apply now"}</span>

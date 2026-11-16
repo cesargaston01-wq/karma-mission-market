@@ -19,7 +19,7 @@ function BlogIndex() {
       <div><p className="mb-3 text-sm font-medium text-primary">THE CONTRIBUTOR JOURNAL</p><h1 className="text-4xl font-bold tracking-normal sm:text-5xl">The Aurum Journal</h1><p className="mt-4 max-w-xl text-base text-muted-foreground">Real accounts. Curated launches. Clear answers.</p></div>
       <span className="text-sm text-muted-foreground">Guides from the Aurum team</span>
     </div>
-    <img src={editorialImage} alt="Gold reply, like, repost and bookmark icons on black" width={1536} height={768} className="mb-10 aspect-[2/1] w-full rounded-lg object-cover sm:aspect-[3/1]" fetchPriority="high" />
+    <img src={editorialImage} alt="Blue reply, like, repost and bookmark icons on black" width={1536} height={768} className="mb-10 aspect-[2/1] w-full rounded-lg object-cover sm:aspect-[3/1]" fetchPriority="high" />
     <section aria-label="Latest articles" className="grid gap-0 md:grid-cols-3 md:gap-8">
       {blogArticles.map((article, index) => <article key={article.slug} className="flex flex-col border-t border-border py-7">
         <div className="mb-5 flex items-center justify-between text-xs text-muted-foreground"><span className="font-medium text-primary">{article.category}</span><span>0{index + 1}</span></div>

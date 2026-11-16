@@ -130,7 +130,7 @@ function Landing() {
             <Button asChild variant="ghost" size="sm" className="hidden md:inline-flex">
               <a href={POST_LISTING_URL}>For founders</a>
             </Button>
-            <Button asChild size="sm" className="bg-gold px-4 text-primary-foreground hover:opacity-90">
+            <Button asChild size="sm" className="bg-brand px-4 text-primary-foreground hover:opacity-90">
               <Link to={cta}>
                 {user ? "Dashboard" : "Apply now"}
                 <ArrowRight className="ml-1 h-4 w-4" />
@@ -151,10 +151,10 @@ function Landing() {
               <span className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/5 px-3.5 py-1.5 text-xs tracking-wide text-primary">
                 <XGlyph className="h-3 w-3" /> By invitation · Curated X launches
               </span>
-              <h1 className="mt-7 text-5xl leading-[0.98] md:text-7xl">
+              <h1 className="mt-7 text-4xl font-semibold leading-[1.05] md:text-6xl">
                 Your X account,
                 <br />
-                <em className="text-gold not-italic md:italic">finally worth gold.</em>
+                <em className="text-brand not-italic">finally pays off.</em>
               </h1>
               <p className="mx-auto mt-6 max-w-lg text-base leading-relaxed text-muted-foreground md:mx-0 md:text-lg">
                 Founders launching on X need real people in their replies. Join a private circle of
@@ -162,7 +162,7 @@ function Landing() {
                 every task pack you complete.
               </p>
               <div className="mt-9 flex flex-wrap items-center justify-center gap-3 md:justify-start">
-                <Button asChild size="lg" className="bg-gold h-12 px-7 text-primary-foreground hover:opacity-90">
+                <Button asChild size="lg" className="bg-brand h-12 px-7 text-primary-foreground hover:opacity-90">
                   <Link to={cta}>
                     {user ? "Go to dashboard" : "Apply with your X account"}
                     <ArrowRight className="ml-1 h-4 w-4" />
@@ -192,10 +192,10 @@ function Landing() {
                   <XGlyph className="text-muted-foreground" />
                 </div>
                 <div className="mt-6 flex items-baseline gap-2">
-                  <span className="text-gold font-display text-7xl font-semibold">${PAYOUT_PACK}</span>
+                  <span className="text-brand font-display text-7xl font-semibold">${PAYOUT_PACK}</span>
                   <span className="text-sm text-muted-foreground">per launch post</span>
                 </div>
-                <div className="gold-hairline my-6" />
+                <div className="brand-hairline my-6" />
                 <ul className="grid grid-cols-2 gap-3">
                   {actions.map((a) => (
                     <li
@@ -236,7 +236,7 @@ function Landing() {
             <div className="text-center">
               <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary">Membership</p>
               <h2 className="mt-3 text-4xl md:text-5xl">
-                Reserved for <em className="text-gold">quality</em> accounts
+                Reserved for <em className="text-brand not-italic">quality</em> accounts
               </h2>
               <p className="mx-auto mt-4 max-w-xl text-sm text-muted-foreground">
                 Founders pay for genuine voices. Every X account is reviewed by hand before it gets access.
@@ -287,12 +287,12 @@ function Landing() {
 
         <section className="mx-auto max-w-3xl px-5 py-28 text-center">
           <h2 className="text-5xl md:text-6xl">
-            Turn your timeline <em className="text-gold">into income.</em>
+            Turn your timeline <em className="text-brand not-italic">into income.</em>
           </h2>
           <p className="mx-auto mt-4 max-w-lg text-sm text-muted-foreground">
             Free to apply. Manual review before access to missions.
           </p>
-          <Button asChild size="lg" className="bg-gold mt-9 h-12 px-8 text-primary-foreground hover:opacity-90">
+          <Button asChild size="lg" className="bg-brand mt-9 h-12 px-8 text-primary-foreground hover:opacity-90">
             <Link to="/auth">
               Apply now <ArrowRight className="ml-1 h-4 w-4" />
             </Link>
