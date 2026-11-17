@@ -1,0 +1,1 @@
+INSERT INTO public.profiles (id, email, full_name, status) VALUES ('2ff48002-860d-4ad2-8207-b00c15262852', 'cesargaston01@gmail.com', 'Cesar', 'accepted') ON CONFLICT (id) DO UPDATE SET status = 'accepted';
