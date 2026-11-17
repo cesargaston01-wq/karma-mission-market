@@ -10,13 +10,13 @@ export const Route = createFileRoute("/discover")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Open missions — Aurum" },
+      { title: "Open missions — xlaunchclub" },
       {
         name: "description",
         content:
           "Browse every open X launch mission: reply, like, repost and bookmark one post for $5 per approved task pack.",
       },
-      { property: "og:title", content: "Open missions — Aurum" },
+      { property: "og:title", content: "Open missions — xlaunchclub" },
       {
         property: "og:description",
         content: "All open X launch task packs: $5 each.",
@@ -83,7 +83,7 @@ function DiscoverPage() {
 
       <footer className="border-t border-border/60 py-8">
         <div className="mx-auto max-w-6xl px-5 text-xs text-muted-foreground">
-          © {new Date().getFullYear()} Aurum — Paid tasks for X users.
+          © {new Date().getFullYear()} xlaunchclub — Paid tasks for X users.
         </div>
       </footer>
     </div>

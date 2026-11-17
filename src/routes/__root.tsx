@@ -82,15 +82,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Aurum — Paid tasks for X users" },
+      { title: "xlaunchclub — Paid tasks for X users" },
       {
         name: "description",
         content: "Get paid $5 to support X launches: comment, like, repost and bookmark curated posts with your X account.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { property: "og:title", content: "Aurum — Paid tasks for X users" },
-      { name: "twitter:title", content: "Aurum — Paid tasks for X users" },
+      { property: "og:title", content: "xlaunchclub — Paid tasks for X users" },
+      { name: "twitter:title", content: "xlaunchclub — Paid tasks for X users" },
       { property: "og:description", content: "Get paid $5 to support X launches: comment, like, repost and bookmark curated posts with your X account." },
       { name: "twitter:description", content: "Get paid $5 to support X launches: comment, like, repost and bookmark curated posts with your X account." },
     ],
@@ -115,17 +115,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "@graph": [
             {
               "@type": "Organization",
-              "@id": "https://aurum-x.lovable.app/#organization",
-              name: "Aurum",
-              url: "https://aurum-x.lovable.app/",
+              "@id": "https://karma-mission-market.lovable.app/#organization",
+              name: "xlaunchclub",
+              url: "https://karma-mission-market.lovable.app/",
               
             },
             {
               "@type": "WebSite",
-              "@id": "https://aurum-x.lovable.app/#website",
-              name: "Aurum",
-              url: "https://aurum-x.lovable.app/",
-              publisher: { "@id": "https://aurum-x.lovable.app/#organization" },
+              "@id": "https://karma-mission-market.lovable.app/#website",
+              name: "xlaunchclub",
+              url: "https://karma-mission-market.lovable.app/",
+              publisher: { "@id": "https://karma-mission-market.lovable.app/#organization" },
             },
           ],
         }),

@@ -5,8 +5,8 @@ import { BlogShell } from "@/components/blog-shell";
 import { Button } from "@/components/ui/button";
 import { blogArticles, BLOG_SITE_URL } from "@/lib/blog";
 
-const title = "The Aurum Journal — Paid X missions, membership & payouts";
-const description = "Guides to Aurum task packs, X account requirements, mission review and payouts.";
+const title = "The xlaunchclub Journal — Paid X missions, membership & payouts";
+const description = "Guides to xlaunchclub task packs, X account requirements, mission review and payouts.";
 
 export const Route = createFileRoute("/blog/")({
   head: () => ({ meta: [{ title }, { name: "description", content: description }, { property: "og:title", content: title }, { property: "og:description", content: description }, { property: "og:type", content: "website" }, { property: "og:url", content: `${BLOG_SITE_URL}/blog` }, { name: "twitter:card", content: "summary_large_image" }], links: [{ rel: "canonical", href: `${BLOG_SITE_URL}/blog` }] }),
@@ -16,8 +16,8 @@ export const Route = createFileRoute("/blog/")({
 function BlogIndex() {
   return <BlogShell><main className="mx-auto max-w-6xl px-5 py-12 sm:py-16">
     <div className="mb-9 flex flex-wrap items-end justify-between gap-4 border-b border-border pb-8">
-      <div><p className="mb-3 text-sm font-medium text-primary">THE CONTRIBUTOR JOURNAL</p><h1 className="text-4xl font-bold tracking-normal sm:text-5xl">The Aurum Journal</h1><p className="mt-4 max-w-xl text-base text-muted-foreground">Real accounts. Curated launches. Clear answers.</p></div>
-      <span className="text-sm text-muted-foreground">Guides from the Aurum team</span>
+      <div><p className="mb-3 text-sm font-medium text-primary">THE CONTRIBUTOR JOURNAL</p><h1 className="text-4xl font-bold tracking-normal sm:text-5xl">The xlaunchclub Journal</h1><p className="mt-4 max-w-xl text-base text-muted-foreground">Real accounts. Curated launches. Clear answers.</p></div>
+      <span className="text-sm text-muted-foreground">Guides from the xlaunchclub team</span>
     </div>
     <img src={editorialImage} alt="Blue reply, like, repost and bookmark icons on black" width={1536} height={768} className="mb-10 aspect-[2/1] w-full rounded-lg object-cover sm:aspect-[3/1]" fetchPriority="high" />
     <section aria-label="Latest articles" className="grid gap-0 md:grid-cols-3 md:gap-8">

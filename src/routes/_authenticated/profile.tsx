@@ -18,10 +18,10 @@ import { useMySubmissions, useProfile } from "@/lib/data";
 export const Route = createFileRoute("/_authenticated/profile")({
   head: () => ({
     meta: [
-      { title: "Profile — Aurum" },
+      { title: "Profile — xlaunchclub" },
       { name: "description", content: "Your crypto wallet, your X profile and your earnings." },
-      { property: "og:title", content: "Profile — Aurum" },
-      { property: "og:description", content: "Manage your Aurum profile and view your earnings." },
+      { property: "og:title", content: "Profile — xlaunchclub" },
+      { property: "og:description", content: "Manage your xlaunchclub profile and view your earnings." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],

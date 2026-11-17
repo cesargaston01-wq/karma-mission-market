@@ -50,10 +50,10 @@ const LIVE_SITE = "https://reddit-task-money.lovable.app";
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
     meta: [
-      { title: "Administration — Aurum" },
+      { title: "Administration — xlaunchclub" },
       { name: "description", content: "Manage missions, submissions and X accounts." },
-      { property: "og:title", content: "Administration — Aurum" },
-      { property: "og:description", content: "Aurum mission and submission administration." },
+      { property: "og:title", content: "Administration — xlaunchclub" },
+      { property: "og:description", content: "xlaunchclub mission and submission administration." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -278,7 +278,7 @@ function AdminPage() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `aurum-accounts-${new Date().toISOString().slice(0, 10)}.csv`;
+    link.download = `xlaunchclub-accounts-${new Date().toISOString().slice(0, 10)}.csv`;
     link.click();
     URL.revokeObjectURL(url);
     toast.success(`${rows.length} account${rows.length > 1 ? "s" : ""} exported`);

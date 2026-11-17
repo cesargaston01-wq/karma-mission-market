@@ -17,4 +17,4 @@ Disallow: /history
 Disallow: /profile
 Disallow: /opportunities/
 
-Sitemap: https://reddit-task-money.lovable.app/sitemap.xml
+Sitemap: https://karma-mission-market.lovable.app/sitemap.xml

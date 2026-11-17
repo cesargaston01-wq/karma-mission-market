@@ -18,7 +18,7 @@ export function BlogShell({ children }: { children: ReactNode }) {
     {children}
     <footer className="mt-16 border-t border-border">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-5 py-8 text-sm text-muted-foreground">
-        <span>Aurum · The Journal</span>
+        <span>xlaunchclub · The Journal</span>
         <div className="flex gap-3"><Button asChild variant="link" size="sm"><Link to="/">Home</Link></Button><Button asChild variant="link" size="sm"><Link to="/auth">Create an account</Link></Button></div>
       </div>
     </footer>

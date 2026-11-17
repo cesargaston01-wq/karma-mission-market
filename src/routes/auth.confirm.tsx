@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 
 export const Route = createFileRoute("/auth/confirm")({
-  head: () => ({ meta: [{ title: "Confirm your email — Aurum" }, { name: "description", content: "Confirm your email address to access your Aurum account." }, { property: "og:title", content: "Confirm your email — Aurum" }, { property: "og:description", content: "Verify your Aurum email address." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
+  head: () => ({ meta: [{ title: "Confirm your email — xlaunchclub" }, { name: "description", content: "Confirm your email address to access your xlaunchclub account." }, { property: "og:title", content: "Confirm your email — xlaunchclub" }, { property: "og:description", content: "Verify your xlaunchclub email address." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: ConfirmPage,
 });
 

@@ -171,7 +171,7 @@ function renderEmail(payload: AuthEmailPayload) {
     case "signup":
       content = `
         <h1 style="color:#0F172A;font-size:24px;margin:0 0 16px;">Welcome to TaskReddit</h1>
-        <p style="color:#334155;font-size:16px;line-height:1.5;margin:0 0 24px;">Confirm your email to start earning on Reddit missions.</p>
+        <p style="color:#334155;font-size:16px;line-height:1.5;margin:0 0 24px;">Confirm your email to start earning on X missions.</p>
         <a href="${confirmUrl}" style="display:inline-block;background:#FF4500;color:#ffffff;text-decoration:none;padding:12px 24px;border-radius:8px;font-weight:600;">Confirm my email</a>
         <p style="color:#64748B;font-size:14px;margin-top:24px;">If the button doesn't work, paste this link:<br>${confirmUrl}</p>
       `;

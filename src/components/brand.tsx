@@ -1,31 +1,25 @@
 import { Link } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
+import logoAsset from "@/assets/xlaunchclub-logo.png.asset.json";
 
-export const BRAND_NAME = "Aurum";
+export const BRAND_NAME = "xlaunchclub";
 
-/** Brand monogram + wordmark used across every page header. */
+/** Brand logo used across every page header. */
 export function BrandMark({ className, size = "md" }: { className?: string; size?: "sm" | "md" }) {
   return (
-    <span className={cn("inline-flex items-center gap-2.5", className)}>
-      <span
-        aria-hidden
-        className={cn(
-          "bg-brand relative inline-flex shrink-0 items-center justify-center rounded-lg font-display font-bold text-primary-foreground shadow-[var(--shadow-glow)]",
-          size === "sm" ? "h-6 w-6 text-sm" : "h-8 w-8 text-lg",
-        )}
-      >
-        A
-      </span>
-      <span className={cn("font-display font-semibold tracking-tight", size === "sm" ? "text-base" : "text-xl")}>
-        Aurum<span className="text-primary">.</span>
-      </span>
+    <span className={cn("inline-flex items-center", className)}>
+      <img
+        src={logoAsset.url}
+        alt="xlaunchclub"
+        className={cn("w-auto", size === "sm" ? "h-5" : "h-7")}
+      />
     </span>
   );
 }
 
 export function BrandLink({ className }: { className?: string }) {
   return (
-    <Link to="/" className={cn("min-w-0", className)} aria-label="Aurum home">
+    <Link to="/" className={cn("min-w-0", className)} aria-label="xlaunchclub home">
       <BrandMark />
     </Link>
   );

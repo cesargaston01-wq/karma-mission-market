@@ -6,9 +6,9 @@ import { OpportunityList } from "@/components/opportunity-list";
 export const Route = createFileRoute("/_authenticated/opportunities/comments")({
   head: () => ({
     meta: [
-      { title: "Missions — Aurum" },
+      { title: "Missions — xlaunchclub" },
       { name: "description", content: "Paid X task packs rewarded $5 each." },
-      { property: "og:title", content: "Missions — Aurum" },
+      { property: "og:title", content: "Missions — xlaunchclub" },
       { property: "og:description", content: "Browse and reserve paid X launch task packs." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

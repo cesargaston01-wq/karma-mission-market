@@ -13,9 +13,9 @@ import { useIsAdmin, useProfile } from "@/lib/data";
 export const Route = createFileRoute("/_authenticated/referrals")({
   head: () => ({
     meta: [
-      { title: "Referrals — Aurum" },
-      { name: "description", content: "Invite friends to Aurum and earn USDC for every validated member and mission." },
-      { property: "og:title", content: "Referrals — Aurum" },
+      { title: "Referrals — xlaunchclub" },
+      { name: "description", content: "Invite friends to xlaunchclub and earn USDC for every validated member and mission." },
+      { property: "og:title", content: "Referrals — xlaunchclub" },
       { property: "og:description", content: "Earn $1 per validated invite and $0.50 per mission they complete." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

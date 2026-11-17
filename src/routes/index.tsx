@@ -31,7 +31,7 @@ const faqs = [
   },
   {
     q: "Who publishes the missions?",
-    a: "Every mission is curated by the Aurum team for founders launching on X. We only accept launches we would be proud to support.",
+    a: "Every mission is curated by the xlaunchclub team for founders launching on X. We only accept launches we would be proud to support.",
   },
   {
     q: "When do I get paid?",
@@ -51,7 +51,7 @@ const faqs = [
   },
 ];
 
-const HOME_TITLE = "Aurum — Get paid $5 to support X launches";
+const HOME_TITLE = "xlaunchclub — Get paid $5 to support X launches";
 const HOME_DESCRIPTION =
   "Join a curated circle of X users. Reply, like, repost and bookmark launch posts and earn $5 per approved task pack.";
 

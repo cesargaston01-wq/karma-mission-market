@@ -7,7 +7,7 @@ import { PasswordInput } from "@/components/password-input";
 import { Label } from "@/components/ui/label";
 
 export const Route = createFileRoute("/auth/reset-password")({
-  head: () => ({ meta: [{ title: "Reset your password — Aurum" }, { name: "description", content: "Choose a new password for your Aurum account." }, { property: "og:title", content: "Reset your password — Aurum" }, { property: "og:description", content: "Update your Aurum account password." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
+  head: () => ({ meta: [{ title: "Reset your password — xlaunchclub" }, { name: "description", content: "Choose a new password for your xlaunchclub account." }, { property: "og:title", content: "Reset your password — xlaunchclub" }, { property: "og:description", content: "Update your xlaunchclub account password." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: ResetPasswordPage,
 });
 

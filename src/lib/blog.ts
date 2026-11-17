@@ -1,4 +1,4 @@
-export const BLOG_SITE_URL = "https://aurum-x.lovable.app";
+export const BLOG_SITE_URL = "https://karma-mission-market.lovable.app";
 
 export type BlogSection = { id: string; title: string; paragraphs: string[]; bullets?: string[] };
 export type BlogArticle = {
@@ -10,12 +10,12 @@ export const blogArticles: BlogArticle[] = [
   {
     slug: "get-paid-on-x",
     title: "Can you really get paid for engaging on X?",
-    description: "How Aurum task packs work: reply, like, repost and bookmark a curated launch post and earn $5 once approved.",
+    description: "How xlaunchclub task packs work: reply, like, repost and bookmark a curated launch post and earn $5 once approved.",
     category: "Getting started", publishedAt: "2026-11-16", readMinutes: 4,
-    summary: "Yes. Aurum pays verified X users $5 per approved task pack: one curated launch post, four genuine actions — reply, like, repost and bookmark.",
+    summary: "Yes. xlaunchclub pays verified X users $5 per approved task pack: one curated launch post, four genuine actions — reply, like, repost and bookmark.",
     sections: [
       { id: "what-is-a-pack", title: "What is a task pack?", paragraphs: [
-        "Founders launching a product on X need real people in their replies during the first hours. Aurum curates those launch posts and turns each one into a task pack.",
+        "Founders launching a product on X need real people in their replies during the first hours. xlaunchclub curates those launch posts and turns each one into a task pack.",
         "A pack is four actions on the same post. You complete them together, submit the link to your reply, and our team reviews it manually.",
       ], bullets: ["Reply with the provided text, typed by hand.", "Like the post.", "Repost it.", "Bookmark it."] },
       { id: "who-can-join", title: "Who can join?", paragraphs: [
@@ -29,10 +29,10 @@ export const blogArticles: BlogArticle[] = [
   },
   {
     slug: "x-account-requirements",
-    title: "What makes an X account eligible for Aurum?",
+    title: "What makes an X account eligible for xlaunchclub?",
     description: "The account criteria we check before giving access to paid X launch missions, and how to improve your chances.",
     category: "Membership", publishedAt: "2026-11-16", readMinutes: 3,
-    summary: "Founders pay for genuine voices. That is why every Aurum member is reviewed by a human before getting access to missions.",
+    summary: "Founders pay for genuine voices. That is why every xlaunchclub member is reviewed by a human before getting access to missions.",
     sections: [
       { id: "criteria", title: "The criteria", paragraphs: ["We review each profile as a whole rather than a single metric."], bullets: [
         "Account at least six months old.", "Real profile photo and bio.", "Regular, natural activity.", "Clean reputation: no spam, no suspensions, no fake followers.",

@@ -38,13 +38,13 @@ import {
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Sign in — Aurum" },
+      { title: "Sign in — xlaunchclub" },
       {
         name: "description",
         content: "Apply with your X account or sign in to access paid launch missions.",
       },
-      { property: "og:title", content: "Sign in — Aurum" },
-      { property: "og:description", content: "Access your Aurum missions dashboard." },
+      { property: "og:title", content: "Sign in — xlaunchclub" },
+      { property: "og:description", content: "Access your xlaunchclub missions dashboard." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
