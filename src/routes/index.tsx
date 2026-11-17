@@ -1,8 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   ArrowRight,
+  Bitcoin,
   Bookmark,
+  CreditCard,
   Heart,
+  Landmark,
   MessageCircle,
   Repeat2,
   ShieldCheck,
@@ -35,7 +38,7 @@ const faqs = [
   },
   {
     q: "When do I get paid?",
-    a: "We manually check your reply, like, repost and bookmark after they have stayed online for at least 3 hours. Once approved, you receive a claim link by email and choose from the available payout methods. Processing times vary.",
+    a: `We manually check your reply, like, repost and bookmark after they have stayed online for at least 3 hours. Once approved, you receive a claim link by email and pick your payout method with Talentir: crypto, PayPal or bank transfer. Processing times vary.`,
   },
   {
     q: "Can I undo the actions afterwards?",
@@ -53,7 +56,7 @@ const faqs = [
 
 const HOME_TITLE = "xlaunchclub — Get paid $5 to support X launches";
 const HOME_DESCRIPTION =
-  "Join a curated circle of X users. Reply, like, repost and bookmark launch posts and earn $5 per approved task pack.";
+  "Join a curated circle of X users. Reply, like, repost and bookmark launch posts and earn $5 per approved task pack, paid in crypto, PayPal or bank transfer.";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -109,6 +112,24 @@ const criteria = [
   { icon: UserCheck, title: "Real, active profile", text: "Profile photo, bio and a natural posting history." },
   { icon: Sparkles, title: "6+ months old", text: "The X account must be at least six months old." },
   { icon: ShieldCheck, title: "Clean reputation", text: "No spam, no suspensions, no bought followers." },
+];
+
+const payouts = [
+  {
+    icon: Bitcoin,
+    title: "Crypto",
+    text: "Send your payout straight to your crypto wallet address.",
+  },
+  {
+    icon: CreditCard,
+    title: "PayPal",
+    text: "Receive it on your PayPal account, in your own currency.",
+  },
+  {
+    icon: Landmark,
+    title: "Bank transfer",
+    text: "Have it wired directly to your bank account.",
+  },
 ];
 
 function Landing() {
@@ -177,7 +198,7 @@ function Landing() {
                   <ShieldCheck className="h-3.5 w-3.5 text-primary" /> Manual review
                 </span>
                 <span className="inline-flex items-center gap-1.5">
-                  <Wallet className="h-3.5 w-3.5 text-primary" /> Crypto · PayPal · Bank transfer
+                  <Wallet className="h-3.5 w-3.5 text-primary" /> Paid via Talentir · Crypto · PayPal · Bank transfer
                 </span>
               </div>
             </div>
@@ -267,6 +288,38 @@ function Landing() {
             <h2 className="mt-3 text-4xl md:text-5xl">Built for the X launch economy</h2>
           </div>
           <FeaturesSectionWithHoverEffects />
+        </section>
+
+        <section className="relative overflow-hidden py-24">
+          <div className="relative mx-auto max-w-6xl px-5">
+            <div className="mx-auto max-w-2xl text-center">
+              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary">Payouts</p>
+              <h2 className="mt-3 text-4xl md:text-5xl">
+                Paid with <em className="text-brand not-italic">Talentir</em>
+              </h2>
+              <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground">
+                Every approved task pack is paid through Talentir, our payment partner. As soon as your
+                work is approved you get a claim link by email and choose how you want to be paid.
+              </p>
+            </div>
+            <div className="mt-12 grid gap-4 md:grid-cols-3">
+              {payouts.map((p) => (
+                <div
+                  key={p.title}
+                  className="group rounded-2xl border border-border/60 bg-background/40 p-6 transition-colors duration-300 hover:border-primary/40"
+                >
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-primary/25 bg-primary/10">
+                    <p.icon className="h-5 w-5 text-primary" />
+                  </div>
+                  <h3 className="mt-5 font-sans text-lg font-semibold">{p.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{p.text}</p>
+                </div>
+              ))}
+            </div>
+            <p className="mt-8 text-center text-xs text-muted-foreground">
+              Crypto, PayPal or bank transfer — you pick the method when you claim your ${PAYOUT_PACK}.
+            </p>
+          </div>
         </section>
 
         <section className="border-y border-border/60 bg-surface/30">
