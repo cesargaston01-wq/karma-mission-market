@@ -54,9 +54,9 @@ export const Route = createFileRoute("/api/public/account-approved")({
         if (logErr) return Response.json({ sent: false, reason: "already_sent" });
 
         const name = profile.full_name ? escapeHtml(profile.full_name) : "";
-        const subject = "Your TaskReddit account is approved 🎉";
+        const subject = "Your xlaunchclub account is approved 🎉";
         const content = `<h1 style="color:#0F172A;font-size:24px;margin:0 0 16px;">You're approved${name ? `, ${name}` : ""}!</h1>
-          <p style="color:#334155;font-size:16px;line-height:1.5;margin:0 0 16px;">Good news: your TaskReddit account has been reviewed and approved.</p>
+          <p style="color:#334155;font-size:16px;line-height:1.5;margin:0 0 16px;">Good news: your xlaunchclub account has been reviewed and approved.</p>
           <p style="color:#334155;font-size:16px;line-height:1.5;margin:0 0 24px;">You can start earning money right now. Pick a mission, leave a natural comment, and get paid in crypto (USDC) for every approved contribution.</p>
           ${button(`${SITE_URL}/opportunities/comments`, "Start earning now")}
           <p style="color:#64748B;font-size:14px;line-height:1.5;margin-top:24px;">Tip: invite friends from your Referrals page and earn $1 per validated friend plus $0.50 on each of their approved missions — for life.</p>`;

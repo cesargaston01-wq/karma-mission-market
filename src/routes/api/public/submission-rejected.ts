@@ -65,11 +65,11 @@ export const Route = createFileRoute("/api/public/submission-rejected")({
           ? escapeHtml(mission.title) + (mission.subreddit ? ` (r/${escapeHtml(mission.subreddit)})` : "")
           : "your mission";
         const link = sub.submitted_url ? escapeHtml(sub.submitted_url) : "";
-        const subject = "Your TaskReddit submission was rejected";
+        const subject = "Your xlaunchclub submission was rejected";
         const content = `<h1 style="color:#0F172A;font-size:24px;margin:0 0 16px;">Submission rejected${name ? `, ${name}` : ""}</h1>
           <p style="color:#334155;font-size:16px;line-height:1.5;margin:0 0 16px;">We reviewed your submission for <strong>${missionLabel}</strong> and unfortunately had to reject it.</p>
           <p style="color:#334155;font-size:16px;line-height:1.5;margin:0 0 16px;"><strong>Reason:</strong> your comment is not visible on Reddit — it was removed or hidden by Reddit (or the subreddit's moderators), so it cannot be approved.</p>
-          ${link ? `<p style="color:#64748B;font-size:14px;line-height:1.5;margin:0 0 16px;">Submitted link: <a href="${link}" style="color:#FF4500;">${link}</a></p>` : ""}
+          ${link ? `<p style="color:#64748B;font-size:14px;line-height:1.5;margin:0 0 16px;">Submitted link: <a href="${link}" style="color:#1d9bf0;">${link}</a></p>` : ""}
           <p style="color:#334155;font-size:16px;line-height:1.5;margin:0 0 24px;">To avoid this next time: keep a natural activity on your Reddit account between missions, write the comment by hand, and check it is still visible when logged out before submitting.</p>
           ${button(`${SITE_URL}/opportunities/comments`, "See other missions")}`;
 

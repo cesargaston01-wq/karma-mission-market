@@ -39,14 +39,14 @@ export const Route = createFileRoute("/api/public/comments-alert")({
           .filter((e) => e && !EXCLUDED.has(e)))];
         if (emails.length === 0) return Response.json({ sent: false, reason: "no_recipients" });
 
-        const subject = "New comment missions are live on TaskReddit — paid in crypto";
+        const subject = "New comment missions are live on xlaunchclub — paid in crypto";
         const html = emailLayout(
           subject,
           `<h1 style="color:#0F172A;font-size:24px;margin:0 0 16px;">New comment missions available</h1>
-<p style="color:#334155;font-size:16px;line-height:1.5;margin:0 0 16px;">Fresh comment missions have just been published on TaskReddit. Grab one before they're taken — each approved comment is <strong>paid in crypto (USDC)</strong>.</p>
+<p style="color:#334155;font-size:16px;line-height:1.5;margin:0 0 16px;">Fresh comment missions have just been published on xlaunchclub. Grab one before they're taken — each approved comment is <strong>paid in crypto (USDC)</strong>.</p>
 <p style="color:#334155;font-size:15px;line-height:1.5;margin:0 0 24px;">Remember: write each comment by hand and keep a natural activity on your account between tasks.</p>
 ${button(`${SITE_URL}/opportunities/comments`, "See available missions")}`,
-          `<br>You receive this because you are a verified TaskReddit member.`,
+          `<br>You receive this because you are a verified xlaunchclub member.`,
         );
         for (let i = 0; i < emails.length; i += 100) {
           await resendRequest("/emails/batch", emails.slice(i, i + 100).map((to) => ({

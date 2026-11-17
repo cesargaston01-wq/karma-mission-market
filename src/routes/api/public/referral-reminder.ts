@@ -54,16 +54,16 @@ export const Route = createFileRoute("/api/public/referral-reminder")({
         const html = emailLayout(
           "Reminder: invite friends, earn crypto for life",
           `<h1 style="color:#0F172A;font-size:24px;margin:0 0 16px;">Don't forget your referral link</h1>
-<p style="color:#334155;font-size:16px;line-height:1.5;margin:0 0 12px;">Quick reminder: your personal TaskReddit invitation link is waiting for you. Share it with friends and earn crypto on every person who joins through you — <strong>for life</strong>.</p>
+<p style="color:#334155;font-size:16px;line-height:1.5;margin:0 0 12px;">Quick reminder: your personal xlaunchclub invitation link is waiting for you. Share it with friends and earn crypto on every person who joins through you — <strong>for life</strong>.</p>
 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin:0 0 24px;">
 <tr><td style="background:#FFF4EF;border:1px solid #FFD9C7;border-radius:8px;padding:16px;">
-<p style="color:#0F172A;font-size:16px;margin:0 0 8px;"><strong style="color:#FF4500;">$1.00</strong> for every invited friend whose account gets validated</p>
-<p style="color:#0F172A;font-size:16px;margin:0;"><strong style="color:#FF4500;">$0.50</strong> for every mission your referral completes and gets approved</p>
+<p style="color:#0F172A;font-size:16px;margin:0 0 8px;"><strong style="color:#1d9bf0;">$1.00</strong> for every invited friend whose account gets validated</p>
+<p style="color:#0F172A;font-size:16px;margin:0;"><strong style="color:#1d9bf0;">$0.50</strong> for every mission your referral completes and gets approved</p>
 </td></tr></table>
 <p style="color:#334155;font-size:15px;line-height:1.5;margin:0 0 24px;">No cap, no expiry: as long as your referrals keep completing missions, you keep earning. Rewards are paid in USDC, just like your missions.</p>
 ${button(`${SITE_URL}/referrals`, "Copy my referral link")}
 <p style="color:#64748B;font-size:14px;margin-top:24px;">Your personal link is always available on the Referrals page of your dashboard.</p>`,
-          `<br>You receive this because you are a verified TaskReddit member.`,
+          `<br>You receive this because you are a verified xlaunchclub member.`,
         );
 
         for (let i = 0; i < emails.length; i += 100) {
@@ -71,7 +71,7 @@ ${button(`${SITE_URL}/referrals`, "Copy my referral link")}
             from: FROM_EMAIL,
             to: [to],
             reply_to: REPLY_TO,
-            subject: "Reminder: invite friends on TaskReddit, earn crypto for life",
+            subject: "Reminder: invite friends on xlaunchclub, earn crypto for life",
             html,
           }));
           await resendRequest("/emails/batch", chunk);

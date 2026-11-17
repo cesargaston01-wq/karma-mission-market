@@ -55,12 +55,12 @@ export const Route = createFileRoute("/api/public/mission-digest")({
 <p style="color:#334155;font-size:15px;line-height:1.5;margin:0 0 24px;">Communities: ${subs.map((s) => `r/${escapeHtml(s.replace(/^r\//, ""))}`).join(", ")}</p>
 ${button(`${SITE_URL}/opportunities/comments`, "See the missions")}
 <p style="color:#64748B;font-size:14px;margin-top:24px;">First come, first served. Remember: stay naturally active on Reddit between tasks.</p>`,
-            `<br>You receive this because you are a verified TaskReddit member.`,
+            `<br>You receive this because you are a verified xlaunchclub member.`,
           );
           for (let i = 0; i < emails.length; i += 100) {
             await resendRequest("/emails/batch", emails.slice(i, i + 100).map((to) => ({
               from: FROM_EMAIL, to: [to], reply_to: REPLY_TO,
-              subject: `${missions.length} new paid missions are available on TaskReddit`, html,
+              subject: `${missions.length} new paid missions are available on xlaunchclub`, html,
             })));
           }
         };

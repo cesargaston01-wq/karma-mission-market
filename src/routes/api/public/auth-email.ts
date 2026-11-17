@@ -145,19 +145,19 @@ async function verifyWebhookSignature({
 function getSubject(type: EmailActionType) {
   switch (type) {
     case "signup":
-      return "Confirm your TaskReddit account";
+      return "Confirm your xlaunchclub account";
     case "recovery":
-      return "Reset your TaskReddit password";
+      return "Reset your xlaunchclub password";
     case "magiclink":
-      return "Sign in to TaskReddit";
+      return "Sign in to xlaunchclub";
     case "invite":
-      return "You're invited to TaskReddit";
+      return "You're invited to xlaunchclub";
     case "email_change":
-      return "Confirm your new email on TaskReddit";
+      return "Confirm your new email on xlaunchclub";
     case "reauthentication":
-      return "Your TaskReddit confirmation code";
+      return "Your xlaunchclub confirmation code";
     default:
-      return "TaskReddit notification";
+      return "xlaunchclub notification";
   }
 }
 
@@ -170,45 +170,45 @@ function renderEmail(payload: AuthEmailPayload) {
   switch (type) {
     case "signup":
       content = `
-        <h1 style="color:#0F172A;font-size:24px;margin:0 0 16px;">Welcome to TaskReddit</h1>
+        <h1 style="color:#0F172A;font-size:24px;margin:0 0 16px;">Welcome to xlaunchclub</h1>
         <p style="color:#334155;font-size:16px;line-height:1.5;margin:0 0 24px;">Confirm your email to start earning on X missions.</p>
-        <a href="${confirmUrl}" style="display:inline-block;background:#FF4500;color:#ffffff;text-decoration:none;padding:12px 24px;border-radius:8px;font-weight:600;">Confirm my email</a>
+        <a href="${confirmUrl}" style="display:inline-block;background:#1d9bf0;color:#ffffff;text-decoration:none;padding:12px 24px;border-radius:8px;font-weight:600;">Confirm my email</a>
         <p style="color:#64748B;font-size:14px;margin-top:24px;">If the button doesn't work, paste this link:<br>${confirmUrl}</p>
       `;
       break;
     case "recovery":
       content = `
         <h1 style="color:#0F172A;font-size:24px;margin:0 0 16px;">Reset your password</h1>
-        <p style="color:#334155;font-size:16px;line-height:1.5;margin:0 0 24px;">Click below to choose a new password for your TaskReddit account.</p>
-        <a href="${confirmUrl}" style="display:inline-block;background:#FF4500;color:#ffffff;text-decoration:none;padding:12px 24px;border-radius:8px;font-weight:600;">Reset password</a>
+        <p style="color:#334155;font-size:16px;line-height:1.5;margin:0 0 24px;">Click below to choose a new password for your xlaunchclub account.</p>
+        <a href="${confirmUrl}" style="display:inline-block;background:#1d9bf0;color:#ffffff;text-decoration:none;padding:12px 24px;border-radius:8px;font-weight:600;">Reset password</a>
       `;
       break;
     case "magiclink":
       content = `
-        <h1 style="color:#0F172A;font-size:24px;margin:0 0 16px;">Sign in to TaskReddit</h1>
+        <h1 style="color:#0F172A;font-size:24px;margin:0 0 16px;">Sign in to xlaunchclub</h1>
         <p style="color:#334155;font-size:16px;line-height:1.5;margin:0 0 24px;">Click below to sign in instantly — no password needed.</p>
-        <a href="${confirmUrl}" style="display:inline-block;background:#FF4500;color:#ffffff;text-decoration:none;padding:12px 24px;border-radius:8px;font-weight:600;">Sign in</a>
+        <a href="${confirmUrl}" style="display:inline-block;background:#1d9bf0;color:#ffffff;text-decoration:none;padding:12px 24px;border-radius:8px;font-weight:600;">Sign in</a>
       `;
       break;
     case "invite":
       content = `
-        <h1 style="color:#0F172A;font-size:24px;margin:0 0 16px;">You're invited to TaskReddit</h1>
+        <h1 style="color:#0F172A;font-size:24px;margin:0 0 16px;">You're invited to xlaunchclub</h1>
         <p style="color:#334155;font-size:16px;line-height:1.5;margin:0 0 24px;">Accept your invitation below.</p>
-        <a href="${confirmUrl}" style="display:inline-block;background:#FF4500;color:#ffffff;text-decoration:none;padding:12px 24px;border-radius:8px;font-weight:600;">Accept invitation</a>
+        <a href="${confirmUrl}" style="display:inline-block;background:#1d9bf0;color:#ffffff;text-decoration:none;padding:12px 24px;border-radius:8px;font-weight:600;">Accept invitation</a>
       `;
       break;
     case "email_change":
       content = `
         <h1 style="color:#0F172A;font-size:24px;margin:0 0 16px;">Confirm your new email</h1>
-        <p style="color:#334155;font-size:16px;line-height:1.5;margin:0 0 24px;">Click below to confirm this new email address for your TaskReddit account.</p>
-        <a href="${confirmUrl}" style="display:inline-block;background:#FF4500;color:#ffffff;text-decoration:none;padding:12px 24px;border-radius:8px;font-weight:600;">Confirm new email</a>
+        <p style="color:#334155;font-size:16px;line-height:1.5;margin:0 0 24px;">Click below to confirm this new email address for your xlaunchclub account.</p>
+        <a href="${confirmUrl}" style="display:inline-block;background:#1d9bf0;color:#ffffff;text-decoration:none;padding:12px 24px;border-radius:8px;font-weight:600;">Confirm new email</a>
       `;
       break;
     case "reauthentication":
       content = `
         <h1 style="color:#0F172A;font-size:24px;margin:0 0 16px;">Confirm it's you</h1>
         <p style="color:#334155;font-size:16px;line-height:1.5;margin:0 0 24px;">Use this code to continue:</p>
-         <p style="font-size:32px;letter-spacing:4px;font-weight:700;color:#FF4500;margin:0 0 24px;">${token}</p>
+         <p style="font-size:32px;letter-spacing:4px;font-weight:700;color:#1d9bf0;margin:0 0 24px;">${token}</p>
       `;
       break;
   }

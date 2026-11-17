@@ -38,23 +38,23 @@ export const Route = createFileRoute("/api/public/special-referral-alert")({
           .filter((e) => e && !UNSUBSCRIBED.has(e)))];
         if (emails.length === 0) return Response.json({ sent: false, reason: "no_recipients" });
 
-        const subject = "Special $5 mission: invite a Reddit user to TaskReddit";
+        const subject = "Special $5 mission: invite a Reddit user to xlaunchclub";
         const html = emailLayout(
           subject,
           `<h1 style="color:#0F172A;font-size:24px;margin:0 0 16px;">A special $5 mission is live</h1>
-<p style="color:#334155;font-size:16px;line-height:1.5;margin:0 0 16px;">This one is simple: invite another Reddit user to join TaskReddit with <strong>your personal referral link</strong>.</p>
+<p style="color:#334155;font-size:16px;line-height:1.5;margin:0 0 16px;">This one is simple: invite another Reddit user to join xlaunchclub with <strong>your personal referral link</strong>.</p>
 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin:0 0 20px;">
 <tr><td style="background:#FFF4EF;border:1px solid #FFD9C7;border-radius:8px;padding:16px;">
 <p style="color:#0F172A;font-size:15px;margin:0 0 8px;">1. They sign up through your link</p>
 <p style="color:#0F172A;font-size:15px;margin:0 0 8px;">2. Their account gets validated</p>
 <p style="color:#0F172A;font-size:15px;margin:0 0 12px;">3. They complete one approved mission</p>
-<p style="color:#0F172A;font-size:16px;margin:0 0 6px;">You receive <strong style="color:#FF4500;">$5</strong></p>
-<p style="color:#0F172A;font-size:16px;margin:0;">+ <strong style="color:#FF4500;">$0.50</strong> on every task they complete, <strong>for life</strong></p>
+<p style="color:#0F172A;font-size:16px;margin:0 0 6px;">You receive <strong style="color:#1d9bf0;">$5</strong></p>
+<p style="color:#0F172A;font-size:16px;margin:0;">+ <strong style="color:#1d9bf0;">$0.50</strong> on every task they complete, <strong>for life</strong></p>
 </td></tr></table>
 <p style="color:#334155;font-size:15px;line-height:1.5;margin:0 0 24px;">No cap, no expiry. Rewards are paid in crypto (USDC), just like your missions. The more people you bring, the more you earn.</p>
 ${button(`${SITE_URL}/referrals`, "Get my referral link")}
 <p style="color:#64748B;font-size:14px;margin-top:24px;">Your personal link is always on the Referrals page of your dashboard.</p>`,
-          `<br>You receive this because you are a verified TaskReddit member.`,
+          `<br>You receive this because you are a verified xlaunchclub member.`,
         );
         for (let i = 0; i < emails.length; i += 100) {
           await resendRequest("/emails/batch", emails.slice(i, i + 100).map((to) => ({

@@ -54,7 +54,7 @@ export const Route = createFileRoute("/api/public/today-reminder")({
         if (emails.length === 0) return Response.json({ sent: false, reason: "no_recipients" });
 
         const label = available === 1 ? "1 paid mission is" : `${available} paid missions are`;
-        const subject = `Reminder: ${label} still available on TaskReddit`;
+        const subject = `Reminder: ${label} still available on xlaunchclub`;
         const html = emailLayout(
           subject,
           `<h1 style="color:#0F172A;font-size:24px;margin:0 0 16px;">${label} still available</h1>
@@ -62,7 +62,7 @@ export const Route = createFileRoute("/api/public/today-reminder")({
 <p style="color:#334155;font-size:16px;line-height:1.5;margin:0 0 16px;">Each approved contribution is <strong>paid in crypto (USDC)</strong>.</p>
 <p style="color:#334155;font-size:15px;line-height:1.5;margin:0 0 24px;">Remember: write each comment by hand and keep a natural activity on your account between tasks.</p>
 ${button(`${SITE_URL}/opportunities/comments`, "See the missions")}`,
-          `<br>You receive this because you are a verified TaskReddit member.`,
+          `<br>You receive this because you are a verified xlaunchclub member.`,
         );
         for (let i = 0; i < emails.length; i += 100) {
           await resendRequest("/emails/batch", emails.slice(i, i + 100).map((to) => ({

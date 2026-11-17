@@ -35,15 +35,15 @@ export const Route = createFileRoute("/api/public/inactive-alert")({
           .filter(Boolean))];
         if (emails.length === 0) return Response.json({ sent: false, reason: "no_recipients" });
 
-        const subject = "A paid mission is still waiting for you on TaskReddit";
+        const subject = "A paid mission is still waiting for you on xlaunchclub";
         const html = emailLayout(
           subject,
           `<h1 style="color:#0F172A;font-size:24px;margin:0 0 16px;">A mission is still available for you</h1>
-<p style="color:#334155;font-size:16px;line-height:1.5;margin:0 0 16px;">Your TaskReddit account is verified, but you haven't completed your first mission yet. Good news: <strong>a mission is still available right now</strong> — grab it and start earning.</p>
+<p style="color:#334155;font-size:16px;line-height:1.5;margin:0 0 16px;">Your xlaunchclub account is verified, but you haven't completed your first mission yet. Good news: <strong>a mission is still available right now</strong> — grab it and start earning.</p>
 <p style="color:#334155;font-size:16px;line-height:1.5;margin:0 0 16px;">Each approved contribution is <strong>paid in crypto (USDC)</strong>. Missions go fast, so don't wait too long.</p>
 <p style="color:#334155;font-size:15px;line-height:1.5;margin:0 0 24px;">Remember: write each comment by hand and keep a natural activity on your account between tasks.</p>
 ${button(`${SITE_URL}/opportunities/comments`, "Start my first mission")}`,
-          `<br>You receive this because you are a verified TaskReddit member.`,
+          `<br>You receive this because you are a verified xlaunchclub member.`,
         );
         for (let i = 0; i < emails.length; i += 100) {
           await resendRequest("/emails/batch", emails.slice(i, i + 100).map((to) => ({

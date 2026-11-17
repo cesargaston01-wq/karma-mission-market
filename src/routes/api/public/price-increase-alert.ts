@@ -42,16 +42,16 @@ export const Route = createFileRoute("/api/public/price-increase-alert")({
         const html = emailLayout(
           subject,
           `<h1 style="color:#0F172A;font-size:24px;margin:0 0 16px;">Missions now pay more 🎉</h1>
-<p style="color:#334155;font-size:16px;line-height:1.5;margin:0 0 20px;">Starting today, every approved comment mission on TaskReddit is paid more.</p>
+<p style="color:#334155;font-size:16px;line-height:1.5;margin:0 0 20px;">Starting today, every approved comment mission on xlaunchclub is paid more.</p>
 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin:0 0 20px;">
 <tr><td align="center" style="background:#FFF4EF;border:1px solid #FFD9C7;border-radius:8px;padding:20px;">
 <p style="color:#64748B;font-size:15px;margin:0 0 6px;text-decoration:line-through;">$3 per comment</p>
-<p style="color:#FF4500;font-size:32px;font-weight:700;margin:0;">$3.50 per comment</p>
+<p style="color:#1d9bf0;font-size:32px;font-weight:700;margin:0;">$3.50 per comment</p>
 </td></tr></table>
 <p style="color:#334155;font-size:16px;line-height:1.5;margin:0 0 16px;">Nothing changes on your side: take a mission, write your comment by hand, submit the link, and get paid once it's approved — now <strong>$3.50</strong> each.</p>
 <p style="color:#334155;font-size:15px;line-height:1.5;margin:0 0 24px;">Payouts are still sent by email through Talentir.</p>
 ${button(`${SITE_URL}/opportunities/comments`, "See available missions")}`,
-          `<br>You receive this because you are a verified TaskReddit member.`,
+          `<br>You receive this because you are a verified xlaunchclub member.`,
         );
         for (let i = 0; i < emails.length; i += 100) {
           await resendRequest("/emails/batch", emails.slice(i, i + 100).map((to) => ({
