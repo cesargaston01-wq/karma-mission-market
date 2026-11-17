@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
-import logoAsset from "@/assets/xlaunchclub-logo.png.asset.json";
+const LOGO_SRC = "/xlaunchclub-logo.png";
 
 export const BRAND_NAME = "xlaunchclub";
 
@@ -9,7 +9,7 @@ export function BrandMark({ className, size = "md" }: { className?: string; size
   return (
     <span className={cn("inline-flex items-center", className)}>
       <img
-        src={logoAsset.url}
+        src={LOGO_SRC}
         alt="xlaunchclub"
         className={cn("w-auto", size === "sm" ? "h-5" : "h-7")}
       />
