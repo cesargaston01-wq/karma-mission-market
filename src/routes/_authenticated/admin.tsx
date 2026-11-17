@@ -44,7 +44,7 @@ import {
 } from "@/lib/data";
 import { payWithTalentir, refreshTalentirStatus } from "@/lib/talentir.functions";
 
-const LIVE_SITE = "https://reddit-task-money.lovable.app";
+const LIVE_SITE = "https://karma-mission-market.lovable.app";
 
 
 export const Route = createFileRoute("/_authenticated/admin")({
@@ -333,13 +333,36 @@ function AdminPage() {
       );
     }
 
-    const { error } = draft.id
-      ? await supabase.from("missions").update(payload).eq("id", draft.id)
-      : await supabase.from("missions").insert(payload);
+    const isNew = !draft.id;
+    const { data: saved, error } = draft.id
+      ? await supabase.from("missions").update(payload).eq("id", draft.id).select("id").single()
+      : await supabase.from("missions").insert(payload).select("id").single();
     if (error) return toast.error(error.message);
     toast.success("Mission saved.");
+    if (isNew && payload.is_active && saved?.id) void notifyMembers(saved.id);
     setDraft(null);
     qc.invalidateQueries({ queryKey: ["missions"] });
+  }
+
+  async function notifyMembers(missionId: string) {
+    const { data } = await supabase.auth.getSession();
+    const token = data.session?.access_token;
+    if (!token) return;
+    const send = (base: string) =>
+      fetch(`${base}/api/public/new-mission-alert`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ missionId }),
+      });
+    try {
+      let r = await send(window.location.origin);
+      if (r.status === 503 || r.status === 404) r = await send(LIVE_SITE);
+      const j = (await r.json().catch(() => ({}))) as { ok?: boolean; recipients?: number };
+      if (j.ok) toast.success(`Members notified by email (${j.recipients ?? 0}).`);
+      else toast.error("Mission saved, but the member email could not be sent.");
+    } catch {
+      toast.error("Mission saved, but the member email could not be sent.");
+    }
   }
 
   async function removeMission(id: string) {
