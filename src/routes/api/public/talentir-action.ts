@@ -55,7 +55,7 @@ export const Route = createFileRoute("/api/public/talentir-action")({
                   ctx.supabase,
                   ctx.userId,
                   parsed.data.submissionId,
-                  parsed.data.returnUrl ?? "https://reddit-task-money.lovable.app/admin",
+                  parsed.data.returnUrl ?? "https://karma-mission-market.lovable.app/admin",
                 )
               : await t.refreshOneSubmission(ctx.supabase, ctx.userId, parsed.data.submissionId);
           return json({ ok: true, ...r });

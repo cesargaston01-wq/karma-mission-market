@@ -12,7 +12,7 @@ import { useSession } from "@/lib/data";
 import { BrandMark } from "@/components/brand";
 
 // The editor preview can't send Resend emails itself, so it asks the live site to do it.
-const LIVE_SITE = "https://reddit-task-money.lovable.app";
+const LIVE_SITE = "https://karma-mission-market.lovable.app";
 async function liveAuthAction(
   body: Record<string, string>,
 ): Promise<{ ok: true } | { ok: false; error: string }> {
