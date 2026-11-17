@@ -11,7 +11,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
-import { WHOP_COMMUNITY_URL } from "@/lib/community";
 import { useMySubmissions, useProfile } from "@/lib/data";
 
 
@@ -230,16 +229,7 @@ function ProfilePage() {
               <div className="min-w-0">
                 <Label htmlFor="email-notifications">Email me a daily summary of new missions</Label>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  One email per day, only when new missions were published. Instant alerts are posted in our{" "}
-                  <a
-                    href={WHOP_COMMUNITY_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-primary hover:underline"
-                  >
-                    Whop community
-                  </a>
-                  .
+                  One email per day, only when new missions were published.
                 </p>
               </div>
               <Switch
