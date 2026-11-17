@@ -19,7 +19,7 @@ export const Route = createFileRoute("/_authenticated/profile")({
   head: () => ({
     meta: [
       { title: "Profile — xlaunchclub" },
-      { name: "description", content: "Your crypto wallet, your X profile and your earnings." },
+      { name: "description", content: "Your X profile, your topics and your earnings." },
       { property: "og:title", content: "Profile — xlaunchclub" },
       { property: "og:description", content: "Manage your xlaunchclub profile and view your earnings." },
       { property: "og:type", content: "website" },
@@ -35,8 +35,6 @@ function ProfilePage() {
   const { data: profile, isLoading } = useProfile();
   const { data: subs } = useMySubmissions();
   const qc = useQueryClient();
-  const [wallet, setWallet] = useState("");
-  const [saving, setSaving] = useState(false);
   const [niches, setNiches] = useState<string[]>([]);
   const [nicheInput, setNicheInput] = useState("");
   const [savingNiches, setSavingNiches] = useState(false);
@@ -47,7 +45,6 @@ function ProfilePage() {
 
   useEffect(() => {
     if (profile) {
-      setWallet(profile.wallet_address);
       setNiches(profile.niches ?? []);
       setEmailOptIn(profile.email_notifications ?? true);
       setPhone(profile.phone_number ?? "");
@@ -112,21 +109,6 @@ function ProfilePage() {
     qc.invalidateQueries({ queryKey: ["profile"] });
     toast.success("Topics updated.");
   }
-
-  async function save() {
-    const clean = wallet.trim();
-    if (clean.length < 10 || clean.length > 120) return toast.error("Invalid wallet address.");
-    setSaving(true);
-    const { error } = await supabase
-      .from("profiles")
-      .update({ wallet_address: clean })
-      .eq("id", profile!.id);
-    setSaving(false);
-    if (error) return toast.error(error.message);
-    qc.invalidateQueries({ queryKey: ["profile"] });
-    toast.success("Wallet updated.");
-  }
-
 
   return (
     <DashboardLayout title="Profile" description="Your details and your earnings.">
@@ -216,25 +198,6 @@ function ProfilePage() {
                   Save
                 </Button>
               </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="wallet">Payout wallet — USDC on Ethereum</Label>
-              <div className="flex flex-col gap-2 sm:flex-row">
-                <Input
-                  id="wallet"
-                  value={wallet}
-                  onChange={(e) => setWallet(e.target.value)}
-                  maxLength={120}
-                  placeholder="0x..."
-                />
-                <Button onClick={save} disabled={saving || wallet === profile.wallet_address}>
-                  Save
-                </Button>
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Payments are sent manually in USDC on the Ethereum blockchain. Make sure this address supports ERC-20 tokens.
-              </p>
             </div>
 
             <div className="space-y-2">
